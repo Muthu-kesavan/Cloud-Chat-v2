@@ -1,0 +1,34 @@
+.message-bubble {
+  border: 1px solid;
+  padding: 10px 20px;
+  border-radius: 25px; 
+  margin: 5px 0;
+  max-width: 60%;
+  word-wrap: break-word;
+  display: inline-block;
+}
+
+.bg-senderBubble {
+  background-color: #8417ff1a; 
+}
+
+.text-senderText {
+  color: #ffffff;
+}
+
+.border-senderBorder {
+  border-color: #5A00EE;
+}
+
+.bg-receiverBubble {
+  background-color: #2a2b331a; 
+}
+
+.text-receiverText {
+  color: white;
+}
+
+.border-receiverBorder {
+  border-color: #ffffff33;
+}
+
