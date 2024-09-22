@@ -32,6 +32,10 @@ const ChannelSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  isRead: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 ChannelSchema.pre("save", function (next){

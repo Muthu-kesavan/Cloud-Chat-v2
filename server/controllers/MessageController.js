@@ -45,3 +45,19 @@ export const uploadFile = async(req, res)=> {
     return res.status(500).send("Internal Server error");
   }
 }
+
+export const sendLocation = async(req, res)=>{
+  try{
+    const message = new Message({
+      sender,
+      messageType,
+      location,
+      timestamp,
+    });
+    await message.save();
+    return res.status(200).json({ message: 'Message sent successfully', data: message });
+  } catch(err){
+    console.error(err)
+    return res.status(500).send("Internal Server Error");
+  }
+}

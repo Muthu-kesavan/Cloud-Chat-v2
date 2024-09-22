@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import{GrAttachment}from "react-icons/gr"
 import { IoSend } from 'react-icons/io5';
 import { RiEmojiStickerLine } from 'react-icons/ri';
+import {GrLocation} from 'react-icons/gr';
 import { apiClient } from '@/lib/api-client';
 import { UPLOAD_FILE } from '@/utils/constants';
 
@@ -57,11 +58,14 @@ const MessageBar = () => {
     setMessage("");
   };
 
+  
+
   const handleAttachmentClick =()=>{
     if(fileInputRef.current){
       fileInputRef.current.click();
     }
   };
+
 
   const handleAttachmentChange= async (e)=>{
     try{
@@ -114,6 +118,12 @@ const MessageBar = () => {
         onChange={(e)=>setMessage(e.target.value)}
         
         />
+        <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
+        onClick={()=>{}}
+        >
+        <GrLocation  className='text-2xl'/>
+        </button>
+        
         <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
         onClick={handleAttachmentClick}
         >

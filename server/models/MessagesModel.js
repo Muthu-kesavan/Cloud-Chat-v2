@@ -13,7 +13,7 @@ const messageSchema = new mongoose.Schema({
   },
   messageType: {
     type: String,
-    enum: ["text","file"],
+    enum: ["text","file","location"],
     required: true,
   },
   content: {
@@ -27,12 +27,20 @@ const messageSchema = new mongoose.Schema({
     required: function() {
       return this.messageType === "file";
     },
+  location:{
+    lat: {
+      type: Number,
+    },
+    lon: {
+      type: Number,
+    },
+  },
   },
   timestamp: {
     type:Date,
     default: Date.now,
   },
-})
+});
 
 const Message = mongoose.model("Messages", messageSchema);
 export default Message;

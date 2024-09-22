@@ -23,6 +23,8 @@ export const GET_ALL_CONTACTS = `${CONTACT_ROUTES}/get-all-contacts`
 export const MESSAGE_ROUTES = "api/messages"
 export const GET_MESSAGES = `${MESSAGE_ROUTES}/get-messages`
 export const UPLOAD_FILE = `${MESSAGE_ROUTES}/upload`
+export const SHARE_LOCATION = `${MESSAGE_ROUTES}/send` 
+
 
 
 export const CHANNEL_ROUTES = "api/channel"

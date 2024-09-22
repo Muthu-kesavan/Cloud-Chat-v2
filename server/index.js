@@ -8,6 +8,7 @@ import contactRoutes from "./routes/ContactRoutes.js";
 import setupSocket from "./socket.js";
 import messagesRoutes from "./routes/MessageRoutes.js";
 import channelRoutes from "./routes/ChannelRoutes.js";
+import postRoutes from "./routes/PostRoutes.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(cors({
 
 app.use('/uploads/profiles', express.static("uploads/profiles"));
 app.use("/uploads/files", express.static("uploads/files"));
+app.use("/uploads/posts", express.static("uploads/posts"));
 
 app.use(cookieParser());
 app.use(express.json());
@@ -32,6 +34,8 @@ app.use("/api/auth",authRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/channel", channelRoutes);
+app.use("/api/post", postRoutes);
+
 
 const server = app.listen(port, ()=>{
   console.log(`http://localhost:${port}`);

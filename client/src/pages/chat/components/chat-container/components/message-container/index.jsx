@@ -3,7 +3,7 @@ import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import './messageContainer.css';
 import { apiClient } from "@/lib/api-client";
-import { GET_CHANNEL_MESSAGES, GET_MESSAGES, HOST } from "@/utils/constants";
+import { GET_CHANNEL_MESSAGES, GET_MESSAGES, HOST, SHARE_LOCATION} from "@/utils/constants";
 import {MdFolderZip} from "react-icons/md";
 import { IoMdArrowDown } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
@@ -24,6 +24,8 @@ const MessageContainer = () => {
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
 
+ 
+  
   useEffect(()=>{
     const getMessages = async ()=>{
       try{
@@ -34,8 +36,8 @@ const MessageContainer = () => {
       }catch(err){
         console.log({err});
       }
+    };
 
-    }
     const getChannelMessages = async()=>{
       try{
         const res = await apiClient.get(
@@ -48,13 +50,13 @@ const MessageContainer = () => {
       }catch(err){
         console.log({err});
       }
-    }
-
+    };
 
     if(selectedChatData._id){
       if(selectedChatType === 'contact') getMessages();
       else if (selectedChatType === 'channel')getChannelMessages();
     }
+
   },[selectedChatData, selectedChatType, setSelectedChatMessages])
   
   //console.log("Selected Chat Messages:", selectedChatMessages);
