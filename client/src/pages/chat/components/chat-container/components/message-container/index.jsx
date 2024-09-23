@@ -176,15 +176,15 @@ const MessageContainer = () => {
             } message-bubble`}
           >
             
-          <span className="text-white/80"><GrLocation className="text-xl mr-2" /></span>
+          <span><GrLocation className="text-xl"/>
           <a
             href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 hover:underline ml-2"
-          >
-            View Location
+            className="text-white hover:text-blue-500 underline ml-2"
+          > Location
           </a>
+          </span>
           </div>
   )}
   
@@ -277,6 +277,26 @@ const MessageContainer = () => {
                 </span>
               </div>
             )}
+            {message.messageType === "location" && (
+          <div
+            className={`${
+              message.sender !== selectedChatData._id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
+          >
+            
+          <span><GrLocation className="text-xl"/>
+          <a
+            href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-blue-500 underline ml-2"
+          > Location
+          </a>
+          </span>
+          </div>
+  )}
           </div>
         )}
   

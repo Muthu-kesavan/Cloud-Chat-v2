@@ -20,48 +20,70 @@ const MessageBar = () => {
   const [message, setMessage] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [location, setLocation] = useState(null);
   const [map, setMap] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [marker, setMarker] = useState(null);
 
   useEffect(() => {
+    let mapInstance;
+
+    const initializeMap = (latitude, longitude) => {
+      mapInstance = L.map('location-map').setView([latitude, longitude], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(mapInstance);
+
+      const userMarker = L.marker([latitude, longitude]).addTo(mapInstance)
+        .bindPopup("You are here!")
+        .openPopup();
+      setMarker(userMarker);
+
+      mapInstance.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        setSelectedLocation({ lat, lng });
+        L.marker([lat, lng]).addTo(mapInstance).bindPopup("You selected this location!").openPopup();
+      });
+
+      setMap(mapInstance);
+    };
+
     if (openModal) {
       const timeoutId = setTimeout(() => {
-        const mapInstance = L.map('location-map').setView([13.139968, 80.2881536], 13);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap'
-        }).addTo(mapInstance);
-  
-        // If you have a selected location, set it on the map
-        if (selectedLocation) {
-          mapInstance.setView([selectedLocation.lat, selectedLocation.lng], 13);
-          L.marker([selectedLocation.lat, selectedLocation.lng]).addTo(mapInstance)
-            .bindPopup("You are here!")
-            .openPopup();
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              initializeMap(latitude, longitude);
+            },
+            (error) => {
+              console.error("Error getting location:", error);
+              alert("Please allow location access to use this feature.");
+              setOpenModal(false); 
+            }
+          );
+        } else {
+          console.error("Geolocation is not supported by this browser.");
+          alert("Geolocation is not supported by your browser.");
+          setOpenModal(false); 
         }
-  
-        mapInstance.on('click', (e) => {
-          const { lat, lng } = e.latlng;
-          setSelectedLocation({ lat, lng });
-          L.marker([lat, lng]).addTo(mapInstance).bindPopup("You are here!").openPopup();
-        });
-  
-        setMap(mapInstance);
-      }, 0); // Delay initialization
-  
+      }, 0);
+
       return () => {
         clearTimeout(timeoutId);
-        if (map) {
-          map.off();
-          map.remove();
+        if (mapInstance) {
+          if (marker) {
+            mapInstance.removeLayer(marker);
+            setMarker(null);
+          }
+          mapInstance.off();
+          mapInstance.remove();
         }
       };
     }
   }, [openModal, selectedLocation]);
-  
-  
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (emojiRef.current && !emojiRef.current.contains(e.target)) {
@@ -87,7 +109,7 @@ const MessageBar = () => {
         messageType: "text",
         fileUrl: undefined,
       };
-      
+
       if (selectedChatType === "contact") {
         socket.emit("sendMessage", messageData);
       } else if (selectedChatType === "channel") {
@@ -99,7 +121,7 @@ const MessageBar = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); 
+      e.preventDefault();
       handleSendMsg();
     }
   };
@@ -147,47 +169,57 @@ const MessageBar = () => {
   };
 
   const handleLocationClick = () => {
-    setOpenModal(true);
+    // Open the modal and check for geolocation permission
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => setOpenModal(true),
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("Please allow location access to use this feature.");
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+      alert("Geolocation is not supported by your browser.");
+    }
   };
 
   const handleShareLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-  
-        // Set the map view to the user's current location
+
         if (map) {
           map.setView([latitude, longitude], 13);
           L.marker([latitude, longitude]).addTo(map)
             .bindPopup("You are here!")
             .openPopup();
         }
-  
+
         const locationMessage = {
           sender: userInfo.id,
           recipient: selectedChatData._id,
           messageType: "location",
           location: { lat: latitude, long: longitude },
         };
-  
+
         if (selectedChatType === "contact") {
           socket.emit("sendMessage", locationMessage);
         } else if (selectedChatType === "channel") {
           socket.emit("send-channel-message", { ...locationMessage, channelId: selectedChatData._id });
         }
-  
-        setOpenModal(false); // Close the modal after sharing location
+
+        setOpenModal(false);
       }, (error) => {
         console.error("Error getting location:", error);
-        setOpenModal(false); // Close the modal if there's an error
+        setOpenModal(false); 
       });
     } else {
       console.error("Geolocation is not supported by this browser.");
-      setOpenModal(false); // Close the modal if geolocation is not supported
+      setOpenModal(false); 
     }
   };
-  
-  
+
   return (
     <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-4 md:px-8 mb-6 gap-4 md:gap-6">
       <div className="flex-1 flex bg-[#2a2b33] rounded-full items-center gap-3 md:gap-5 pr-3 md:pr-5">
@@ -199,7 +231,7 @@ const MessageBar = () => {
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress} 
         />
-  
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
@@ -215,7 +247,7 @@ const MessageBar = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-  
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
@@ -231,64 +263,65 @@ const MessageBar = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-  
-        <input type="file" className="hidden" ref={fileInputRef} onChange={handleAttachmentChange} />
-  
-        <div className="relative">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <button
-                  className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
-                  onClick={() => setEmojiOpen(true)}
-                >
-                  <RiEmojiStickerLine className="text-2xl" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="border-none">
-                <p>Emoji</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-  
-          <div className="absolute bottom-16 right-0" ref={emojiRef}>
-            <EmojiPicker
-              theme="dark"
-              open={emojiOpen}
-              onEmojiClick={handleEmoji}
-              autoFocusSearch={false}
-            />
-          </div>
-        </div>
+
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleAttachmentChange}
+          className="hidden"
+        />
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <button
+                className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                onClick={() => setEmojiOpen(!emojiOpen)}
+                ref={emojiRef}
+              >
+                <RiEmojiStickerLine className="text-2xl" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="border-none">
+              <p>Emoji</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <button
+  className="focus:border-none focus:outline-none"
+  onClick={handleSendMsg}
+>
+  <IoSend className="text-2xl text-neutral-500 duration-300 transition-all hover:text-white hover:bg-[#5A00EE] p-1 rounded-full" />
+</button>
+
       </div>
-  
-      <button
-        className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
-        onClick={handleSendMsg}
-      >
-        <IoSend className="text-[#5201fe] hover:text-[#7A33FF] text-2xl" />
-      </button>
-  
+
+      {emojiOpen && (
+        <div className="absolute z-10">
+          <EmojiPicker onEmojiClick={handleEmoji} />
+        </div>
+      )}
+
       <Dialog open={openModal} onOpenChange={setOpenModal}>
-  <DialogContent className="bg-[#181920] border-none text-white w-[90%] max-w-[400px] h-auto flex flex-col p-4">
-    <DialogHeader>
-      <DialogTitle>Share Your Location</DialogTitle>
-      <DialogDescription>Click on the map to select your location.</DialogDescription>
-    </DialogHeader>
-    
-    <div id="location-map" style={{ height: '300px', width: '100%' }}></div>
-
-    <div className="flex justify-end mt-4">
-      <button onClick={handleShareLocation} className="bg-green-500 text-white p-2 rounded">
-        Share Location
-      </button>
-      <button onClick={() => setOpenModal(false)} className="ml-2 p-2 rounded">
-        Cancel
-      </button>
-    </div>
-  </DialogContent>
-</Dialog>
-
+        <DialogContent>
+          <div id="location-map" className="h-96 w-full" />
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={() => setOpenModal(false)}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleShareLocation}
+              className="bg-green-500 text-white px-4 py-2 rounded"
+            >
+              Share Location
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
