@@ -1,5 +1,6 @@
 import { renameSync, unlinkSync } from 'fs';
 import Post from "../models/PostModel.js";
+import User from '../models/UserModel.js';
 
 export const createPost = async (req, res) => {
   try {
@@ -172,4 +173,57 @@ export const sharePost = async (req, res) => {
   }
 };
 
+export const saveOrUnsavePost = async(req, res)=>{
+  try {
+    const userId = req.userId; 
+    const {postId} = req.params;
 
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    if (user.savedPosts.includes(postId)) {
+      user.savedPosts = user.savedPosts.filter(id => id.toString() !== postId);
+      await user.save();
+      return res.status(200).json({ message: "Post unsaved successfully" });
+    } else {
+      user.savedPosts.push(postId);
+      await user.save();
+      return res.status(200).json({ message: "Post saved successfully" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getSavedPosts = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const user = await User.findById(userId).populate("savedPosts");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json({ savedPosts: user.savedPosts });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getUserPosts = async (req, res) => {
+  try {
+    const userId = req.userId; 
+    const userPosts = await Post.find({ userId });
+    if (!userPosts || userPosts.length === 0) {
+      return res.status(404).json({ message: "You have not posted anything yet." });
+    }
+    res.status(200).json({ posts: userPosts });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
