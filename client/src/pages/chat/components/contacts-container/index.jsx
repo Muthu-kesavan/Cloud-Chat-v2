@@ -7,11 +7,13 @@ import { GET_DM_CONTACTS_ROUTES, GET_USER_CHANNELS } from "@/utils/constants";
 import { useAppStore } from "@/store";
 import ContactList from "@/components/ui/ContactList";
 import CreateChannel from "./components/create-channel";
-import { FaCaretDown } from "react-icons/fa";
+import { FaCaretDown, FaRegCompass } from "react-icons/fa";
+import { TbWriting } from "react-icons/tb";
 
 const ContactsContainer = () => {
   const { directMessagesContacts, setDirectMessagesContacts, channels, setChannels } = useAppStore();
   const [isExpanded, setIsExpanded] = useState(false); 
+  const [isTouch, setIstTouch] = useState(false);
   const [isChannelExpand, setIsChannelExpand] = useState(false);
 
   useEffect(() => {
@@ -38,14 +40,33 @@ const ContactsContainer = () => {
       </div>
       <div className="my-5">
         <div className="flex items-center justify-between pr-10">
+          <Title text="Let's Post" />
+          <div className="flex items-center">
+            <TbWriting className="text-neutral-400 font-light text-3xl text-opacity-90 text-start cursor-pointer transition-transform duration-300 hover:translate-x-[10px] hover:text-neutral-100 ml-0" />
+          </div>
+        </div>
+      </div>
+      <div className="my-5">
+        <div className="flex items-center justify-between pr-10">
+          <Title text="Explore" />
+          <div className="flex items-center">
+            <FaRegCompass className={`text-neutral-400 font-light text-3xl text-opacity-90 text-start hover:-rotate-180 hover:translate-x-[5px] hover:text-neutral-100 cursor-pointer transition-all ml-2 ${isTouch ? "rotate-180" : ""}`}
+              onClick={() => setIstTouch(!isTouch)} />
+          </div>
+        </div>
+      </div>
+      <div className="my-5">
+        <div className="flex items-center justify-between pr-10">
           <Title text="Messages" />
           <div className="flex items-center">
             <NewDm />
-            <FaCaretDown   
-              className={`text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all ${isExpanded ? "rotate-180" : ""}`} 
-              onClick={() => setIsExpanded(!isExpanded)}
-              style={{ marginLeft: '40px' }} 
-            />
+            {directMessagesContacts.length > 0 && (
+              <FaCaretDown   
+                className={`text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all ${isExpanded ? "rotate-180" : ""}`} 
+                onClick={() => setIsExpanded(!isExpanded)}
+                style={{ marginLeft: '40px' }} 
+              />
+            )}
           </div>
         </div>
         {isExpanded && (
@@ -59,11 +80,13 @@ const ContactsContainer = () => {
           <Title text="Groups" />
           <div className="flex items-center">
             <CreateChannel />
-            <FaCaretDown
-              className={`text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all ${isChannelExpand ? "rotate-180" : ""}`} 
-              style={{ marginLeft: '40px' }} 
-              onClick={() => setIsChannelExpand(!isChannelExpand)}
-            />
+            {channels.length > 0 && ( 
+              <FaCaretDown
+                className={`text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all ${isChannelExpand ? "rotate-180" : ""}`} 
+                style={{ marginLeft: '40px' }} 
+                onClick={() => setIsChannelExpand(!isChannelExpand)}
+              />
+            )}
           </div>
         </div>
         {isChannelExpand && (

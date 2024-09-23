@@ -15,6 +15,7 @@ const CreateChannel = () => {
   const [allContacts, setAllContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [channelName, setChannelName] = useState("");
+  const [isRotated, setIsRotated] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -44,15 +45,23 @@ const CreateChannel = () => {
     }
   };
 
+  const handleIconClick = () => {
+    setNewChannelModal(true);
+    setIsRotated(true);
+    setTimeout(() => setIsRotated(false), 100); 
+  };
+
   return (
     <>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>
-            <FaPlus
-              className="text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all duration-300" 
-              onClick={() => setNewChannelModal(true)}
-            />
+          <FaPlus
+              className={`text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-transform duration-300 ${isRotated ? 'rotate-180' : ''}`}
+              onClick={handleIconClick}
+              onMouseEnter={() => setIsRotated(true)}
+              onMouseLeave={() => setIsRotated(false)}
+          />
           </TooltipTrigger>
           <TooltipContent className="bg-[#1c1b1e] border-none mb-2 p-3 text-white">
             Create New Group

@@ -8,11 +8,11 @@ import { useNavigate } from "react-router-dom";
 import { IoPowerSharp } from "react-icons/io5";
 import { apiClient } from "@/lib/api-client";
 import { useState } from "react";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"; 
 const ProfileInfo = () => {
   const { userInfo, setUserInfo } = useAppStore();
   const navigate = useNavigate();
-  const [isModalOpen, setModalOpen] = useState(false); 
+  const [isDialogOpen, setDialogOpen] = useState(false); 
 
   const logOut = async () => {
     try {
@@ -26,28 +26,22 @@ const ProfileInfo = () => {
     }
   };
 
- 
   const getInitials = () => {
     if (userInfo && userInfo.name) {
-      return userInfo.name.charAt(0).toUpperCase(); 
+      return userInfo.name.charAt(0).toUpperCase();
     } else if (userInfo && userInfo.email) {
-      return userInfo.email.charAt(0).toUpperCase(); 
+      return userInfo.email.charAt(0).toUpperCase();
     }
-    return ''; 
+    return '';
   };
 
   const handleLogoutClick = () => {
-    setModalOpen(true);
+    setDialogOpen(true); 
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-  };
-
- 
   const handleConfirmLogout = () => {
     logOut();
-    closeModal();
+    setDialogOpen(false); 
   };
 
   return (
@@ -105,27 +99,23 @@ const ProfileInfo = () => {
         </TooltipProvider>
       </div>
 
-      {isModalOpen && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-    <div className=" bg-[#5201fe] rounded-lg p-6 shadow-lg max-w-md w-full">
-      <h3 className=" text-center text-lg font-bold color">Are you sure you want to log out?</h3>
-      <div className="flex justify-center mt-4 gap-3">
-        <button
-          onClick={closeModal}
-          className=" flex items-center bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleConfirmLogout}
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-        >
-          Log out
-        </button>
-      </div>
+      
+      <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+  <DialogContent className="bg-[#5201fe] rounded-lg border-none text-white max-w-md w-full p-6 flex flex-col">
+    <DialogHeader>
+      <DialogTitle className="text-center text-lg font-bold">Are you sure you want to log out?</DialogTitle>
+      {/*<DialogDescription className="text-center text-xl text color white">Are you sure you want to log out?</DialogDescription>*/}
+    </DialogHeader>
+    <div className="flex justify-center mt-4 gap-3">
+      <button onClick={() => setDialogOpen(false)} className="flex items-center bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">
+        Cancel
+      </button>
+      <button onClick={handleConfirmLogout} className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+        Log out
+      </button>
     </div>
-  </div>
-)}
+  </DialogContent>
+</Dialog>
 
     </div>
   );

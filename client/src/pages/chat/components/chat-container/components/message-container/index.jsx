@@ -266,9 +266,9 @@ const MessageContainer = () => {
           </div>
         )}
   
-        {/* Timestamp for non-text messages, outside the bubble */}
+        
         {message.messageType !== "text" && (
-          <div className="text-xs text-gray-600"> {/* Added margin-top for spacing */}
+          <div className="text-xs text-gray-600"> 
             {moment(message.timestamp).format("LT")}
           </div>
         )}

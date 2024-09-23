@@ -4,6 +4,7 @@ import { getColor } from "@/lib/utils";
 import { useAppStore } from "@/store";
 import { HOST } from "@/utils/constants";
 import { RiCloseFill } from "react-icons/ri";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ChatHeader = () => {
   const { closeChat, selectedChatData, selectedChatType } = useAppStore();
@@ -74,12 +75,21 @@ const ChatHeader = () => {
         </div>
 
         <div className="flex items-center justify-center gap-5">
-          <button
-            className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
-            onClick={closeChat}
-          >
-            <RiCloseFill className="text-3xl" />
-          </button>
+        <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <button
+                    className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                    onClick={closeChat}
+                  >
+                    <RiCloseFill className="text-3xl" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="border-none">
+                  <p>Close Chat</p>
+                </TooltipContent>
+              </Tooltip>
+        </TooltipProvider>  
         </div>
       </div>
       {isModalOpen && (

@@ -1,5 +1,7 @@
+import Location from "../models/LocationModel.js";
 import Message from "../models/MessagesModel.js";
 import {mkdirSync, renameSync} from 'fs';
+
 export const getMessages = async(req, res)=>{
   try{
     const user1 = req.userId;
@@ -44,20 +46,30 @@ export const uploadFile = async(req, res)=> {
     console.log({err});
     return res.status(500).send("Internal Server error");
   }
-}
+};
 
-export const sendLocation = async(req, res)=>{
-  try{
-    const message = new Message({
-      sender,
-      messageType,
-      location,
-      timestamp,
-    });
-    await message.save();
-    return res.status(200).json({ message: 'Message sent successfully', data: message });
-  } catch(err){
-    console.error(err)
-    return res.status(500).send("Internal Server Error");
+export const shareLocation = async(req, res)=>{
+  const { lat, long } = req.body;
+  const userId = req.userId; 
+  try {
+    const newLocation = new Location({ userId, lat, long});
+    await newLocation.save();
+    res.status(200).json({ message: "Location shared successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-}
+};
+
+export const allLocations = async(req, res)=> {
+  const userId = req.userId;
+
+  try {
+    const locations = await Location.find({ userId });
+    if (locations.length === 0) {
+      return res.status(404).json({ message: "No locations found" });
+    }
+    res.status(200).json(locations);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
