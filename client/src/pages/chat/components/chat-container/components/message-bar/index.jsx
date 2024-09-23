@@ -1,13 +1,14 @@
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useAppStore } from '@/store';
 import { useSocket } from '@/context/socketContext';
 import EmojiPicker from 'emoji-picker-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { GrAttachment } from "react-icons/gr";
+import { GrAttachment, GrLocation } from "react-icons/gr";
 import { IoSend } from 'react-icons/io5';
 import { RiEmojiStickerLine } from 'react-icons/ri';
-import { GrLocation } from 'react-icons/gr';
 import { apiClient } from '@/lib/api-client';
-import { SHARE_LOCATION, UPLOAD_FILE } from '@/utils/constants';
+import { UPLOAD_FILE } from '@/utils/constants';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -20,7 +21,47 @@ const MessageBar = () => {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [location, setLocation] = useState(null);
+  const [map, setMap] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
+  useEffect(() => {
+    if (openModal) {
+      const timeoutId = setTimeout(() => {
+        const mapInstance = L.map('location-map').setView([13.139968, 80.2881536], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap'
+        }).addTo(mapInstance);
+  
+        // If you have a selected location, set it on the map
+        if (selectedLocation) {
+          mapInstance.setView([selectedLocation.lat, selectedLocation.lng], 13);
+          L.marker([selectedLocation.lat, selectedLocation.lng]).addTo(mapInstance)
+            .bindPopup("You are here!")
+            .openPopup();
+        }
+  
+        mapInstance.on('click', (e) => {
+          const { lat, lng } = e.latlng;
+          setSelectedLocation({ lat, lng });
+          L.marker([lat, lng]).addTo(mapInstance).bindPopup("You are here!").openPopup();
+        });
+  
+        setMap(mapInstance);
+      }, 0); // Delay initialization
+  
+      return () => {
+        clearTimeout(timeoutId);
+        if (map) {
+          map.off();
+          map.remove();
+        }
+      };
+    }
+  }, [openModal, selectedLocation]);
+  
+  
   useEffect(() => {
     function handleClickOutside(e) {
       if (emojiRef.current && !emojiRef.current.contains(e.target)) {
@@ -39,22 +80,18 @@ const MessageBar = () => {
 
   const handleSendMsg = async () => {
     if (message.trim()) {
+      const messageData = {
+        sender: userInfo.id,
+        content: message,
+        recipient: selectedChatData._id,
+        messageType: "text",
+        fileUrl: undefined,
+      };
+      
       if (selectedChatType === "contact") {
-        socket.emit("sendMessage", {
-          sender: userInfo.id,
-          content: message,
-          recipient: selectedChatData._id,
-          messageType: "text",
-          fileUrl: undefined,
-        });
+        socket.emit("sendMessage", messageData);
       } else if (selectedChatType === "channel") {
-        socket.emit("send-channel-message", {
-          sender: userInfo.id,
-          content: message,
-          messageType: "text",
-          fileUrl: undefined,
-          channelId: selectedChatData._id,
-        });
+        socket.emit("send-channel-message", { ...messageData, channelId: selectedChatData._id });
       }
       setMessage("");
     }
@@ -88,22 +125,17 @@ const MessageBar = () => {
         });
         if (res.status === 200 && res.data) {
           setIsUploading(false);
+          const messageData = {
+            sender: userInfo.id,
+            content: undefined,
+            recipient: selectedChatData._id,
+            messageType: "file",
+            fileUrl: res.data.filePath,
+          };
           if (selectedChatType === "contact") {
-            socket.emit("sendMessage", {
-              sender: userInfo.id,
-              content: undefined,
-              recipient: selectedChatData._id,
-              messageType: "file",
-              fileUrl: res.data.filePath,
-            });
+            socket.emit("sendMessage", messageData);
           } else if (selectedChatType === "channel") {
-            socket.emit("send-channel-message", {
-              sender: userInfo.id,
-              content: undefined,
-              messageType: "file",
-              fileUrl: res.data.filePath,
-              channelId: selectedChatData._id,
-            });
+            socket.emit("send-channel-message", { ...messageData, channelId: selectedChatData._id });
           }
         }
       }
@@ -115,43 +147,47 @@ const MessageBar = () => {
   };
 
   const handleLocationClick = () => {
+    setOpenModal(true);
+  };
+
+  const handleShareLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          setOpenModal(true);
-        },
-        (error) => {
-          console.error(error);
-          alert("Unable to retrieve your location.");
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+  
+        // Set the map view to the user's current location
+        if (map) {
+          map.setView([latitude, longitude], 13);
+          L.marker([latitude, longitude]).addTo(map)
+            .bindPopup("You are here!")
+            .openPopup();
         }
-      );
+  
+        const locationMessage = {
+          sender: userInfo.id,
+          recipient: selectedChatData._id,
+          messageType: "location",
+          location: { lat: latitude, long: longitude },
+        };
+  
+        if (selectedChatType === "contact") {
+          socket.emit("sendMessage", locationMessage);
+        } else if (selectedChatType === "channel") {
+          socket.emit("send-channel-message", { ...locationMessage, channelId: selectedChatData._id });
+        }
+  
+        setOpenModal(false); // Close the modal after sharing location
+      }, (error) => {
+        console.error("Error getting location:", error);
+        setOpenModal(false); // Close the modal if there's an error
+      });
     } else {
-      alert("Geolocation is not supported by this browser.");
+      console.error("Geolocation is not supported by this browser.");
+      setOpenModal(false); // Close the modal if geolocation is not supported
     }
   };
-
-  const handleShareLocation = async () => {
-    if (location) {
-      await apiClient.post(SHARE_LOCATION, {
-        lat: location.latitude,
-        long: location.longitude,
-      });
-      socket.emit("sendMessage", {
-        sender: userInfo.id,
-        content: "Shared my location",
-        recipient: selectedChatData._id,
-        messageType: "location",
-        location: location,
-      });
-      setOpenModal(false);
-      setLocation(null);
-    }
-  };
-
+  
+  
   return (
     <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-4 md:px-8 mb-6 gap-4 md:gap-6">
       <div className="flex-1 flex bg-[#2a2b33] rounded-full items-center gap-3 md:gap-5 pr-3 md:pr-5">
@@ -234,21 +270,25 @@ const MessageBar = () => {
       </button>
   
       <Dialog open={openModal} onOpenChange={setOpenModal}>
-        <DialogContent className="bg-[#181920] border-none text-white w-[90%] max-w-[400px] h-auto flex flex-col p-4">
-          <DialogHeader>
-            <DialogTitle>Share Your Location</DialogTitle>
-            <DialogDescription>Are you sure you want to share your current location?</DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end mt-4">
-            <button onClick={handleShareLocation} className="bg-green-500 text-white p-2 rounded">
-              Yes
-            </button>
-            <button onClick={() => setOpenModal(false)} className="ml-2 p-2 rounded">
-              No
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+  <DialogContent className="bg-[#181920] border-none text-white w-[90%] max-w-[400px] h-auto flex flex-col p-4">
+    <DialogHeader>
+      <DialogTitle>Share Your Location</DialogTitle>
+      <DialogDescription>Click on the map to select your location.</DialogDescription>
+    </DialogHeader>
+    
+    <div id="location-map" style={{ height: '300px', width: '100%' }}></div>
+
+    <div className="flex justify-end mt-4">
+      <button onClick={handleShareLocation} className="bg-green-500 text-white p-2 rounded">
+        Share Location
+      </button>
+      <button onClick={() => setOpenModal(false)} className="ml-2 p-2 rounded">
+        Cancel
+      </button>
+    </div>
+  </DialogContent>
+</Dialog>
+
     </div>
   );
 };

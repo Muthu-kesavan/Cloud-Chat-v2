@@ -32,3 +32,11 @@
   border-color: #ffffff33;
 }
 
+.location-message {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 5px 0;
+}
+
+

@@ -71,11 +71,9 @@ export const createChatSlice = (set, get) => ({
     const index = dmContacts.findIndex((contact)=> contact._id ===fromId);
     console.log({data, index, dmContacts, userId, message, fromData});
     if (index !== -1 && index !== undefined){
-      
       dmContacts.splice(index, 1);
       dmContacts.unshift(data);
-    } else{
-      
+    } else{ 
       dmContacts.unshift(fromData);
     }
     set({directMessagesContacts: dmContacts});

@@ -7,6 +7,7 @@ import { GET_CHANNEL_MESSAGES, GET_MESSAGES, HOST, SHARE_LOCATION} from "@/utils
 import {MdFolderZip} from "react-icons/md";
 import { IoMdArrowDown } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
+import {GrLocation} from "react-icons/gr"
 import { getColor } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Linkify from "react-linkify";
@@ -25,7 +26,6 @@ const MessageContainer = () => {
   const [imageUrl, setImageUrl] = useState(null);
 
  
-  
   useEffect(()=>{
     const getMessages = async ()=>{
       try{
@@ -56,15 +56,9 @@ const MessageContainer = () => {
       if(selectedChatType === 'contact') getMessages();
       else if (selectedChatType === 'channel')getChannelMessages();
     }
-
   },[selectedChatData, selectedChatType, setSelectedChatMessages])
-  
-  //console.log("Selected Chat Messages:", selectedChatMessages);
-
-  
   useEffect(() => {
     if (scrollRef.current) {
-      //console.log("Scrolling to the latest message");
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedChatMessages]);
@@ -81,9 +75,6 @@ const MessageContainer = () => {
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
-
-      //console.log("Rendering message:", message.content);
-  
 
       return (
         <div key={index}>
@@ -131,7 +122,6 @@ const MessageContainer = () => {
             : "text-right rounded-full"
         }`}
       >
-        
         {message.messageType === "text" && (
           <div
             className={`${
@@ -141,7 +131,7 @@ const MessageContainer = () => {
             } message-bubble`}
           >
             <Linkify>
-            {message.content}
+              {message.content}
             </Linkify>
           </div>
         )}
@@ -154,33 +144,57 @@ const MessageContainer = () => {
                 : "bg-receiverBubble text-receiverText border-receiverBorder"
             } message-bubble`}
           >
-            {checkImage(message.fileUrl) ? (<div className="cursor-pointer"
-             onClick={()=>{
-              setShowImage(true)
-              setImageUrl(message.fileUrl);
-             }}
-             >
-              <img src={`${HOST}/${message.fileUrl}`} height={300} width={300}/>
-            </div>
-             ) :(
-            <div className="flex items-center justify-center gap-4">
-              <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
-              <MdFolderZip />
-              </span>
-              <span>{message.fileUrl.split("/").pop()}</span>
-              <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={()=> downloadFile(message.fileUrl)}>
-              <IoMdArrowDown />
-              </span>
-            </div>
-          )}
+            {checkImage(message.fileUrl) ? (
+              <div className="cursor-pointer"
+                onClick={() => {
+                  setShowImage(true);
+                  setImageUrl(message.fileUrl);
+                }}
+              >
+                <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
+                  <MdFolderZip />
+                </span>
+                <span>{message.fileUrl.split("/").pop()}</span>
+                <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
+                  <IoMdArrowDown />
+                </span>
+              </div>
+            )}
           </div>
         )}
+  
+        {message.messageType === "location" && (
+          <div
+            className={`${
+              message.sender !== selectedChatData._id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
+          >
+            
+          <span className="text-white/80"><GrLocation className="text-xl mr-2" /></span>
+          <a
+            href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline ml-2"
+          >
+            View Location
+          </a>
+          </div>
+  )}
+  
         <div className="text-xs text-gray-600">
           {moment(message.timestamp).format("LT")}
         </div>
       </div>
     );
   };
+  
   
   const renderChannelMessages = (message, previousMessage) => {
     const messageMarginTop = previousMessage && previousMessage.messageType !== message.messageType
@@ -275,10 +289,6 @@ const MessageContainer = () => {
       </div>
     );
   };
-  
-  
-  
-  
 
   return (
     <div className="flex-1 overflow-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lh:w-[70vw] xl:w-[80vw] w-full">
