@@ -196,116 +196,68 @@ const MessageContainer = () => {
   };
   
   
-  const renderChannelMessages = (message, previousMessage) => {
-    const messageMarginTop = previousMessage && previousMessage.messageType !== message.messageType
-      ? "mt-4" 
-      : "mt-2"; 
-  
+  const renderChannelMessages = (message) => {
     return (
-      <div className={`flex flex-col items-start gap-2 ${message.sender._id === userInfo.id ? "items-end" : "items-start"} ${messageMarginTop}`}>
-        {message.sender._id !== userInfo.id && (
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8 rounded-full overflow-hidden">
-              {message.sender.image ? (
-                <AvatarImage
-                  src={`${HOST}/${message.sender.image}`}
-                  alt="Profile"
-                  className="object-cover w-full h-full bg-black"
-                />
-              ) : (
-                <AvatarFallback
-                  className={`uppercase h-8 w-8 text-lg flex items-center justify-center rounded-full ${getColor(
-                    message.sender.color
-                  )}`}
-                >
-                  {message.sender.name
-                    ? message.sender.name.charAt(0)
-                    : message.sender.email.charAt(0)}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <span className="text-sm text-white/60">{message.sender.name}</span>
-          </div>
-        )}
-  
+      <div
+        className={`${
+          message.sender._id === userInfo.id
+            ? "text-right"
+            : "text-left"
+        }`}
+      >
         {message.messageType === "text" && (
           <div
             className={`${
               message.sender._id === userInfo.id
-                ? "bg-receiverBubble text-receiverText border-receiverBorder"
-                : "bg-senderBubble text-senderText border-senderBorder"
-            } message-bubble p-3 rounded-lg relative ml-9`}
-          >
-            <Linkify>
-            {message.content}
-            </Linkify>
-            <span className="text-xs text-white/60 mt-1 block text-right">
-              {moment(message.timestamp).format("LT")}
-            </span>
-          </div>
-        )}
-  
-        {message.messageType === "file" && (
-          <div
-            className={`${
-              message.sender._id !== userInfo.id
-                ? "bg-senderBubble text-senderText border-senderBorder"
-                : "bg-receiverBubble text-receiverText border-receiverBorder"
-            } message-bubble `} 
-          >
-            {checkImage(message.fileUrl) ? (
-              <div
-                className="cursor-pointer"
-                onClick={() => {
-                  setShowImage(true);
-                  setImageUrl(message.fileUrl);
-                }}
-              >
-                <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-4">
-                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
-                  <MdFolderZip />
-                </span>
-                <span>{message.fileUrl.split("/").pop()}</span>
-                <span
-                  className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all"
-                  onClick={() => downloadFile(message.fileUrl)}
-                >
-                  <IoMdArrowDown />
-                </span>
-              </div>
-            )}
-            {message.messageType === "location" && (
-          <div
-            className={`${
-              message.sender !== selectedChatData._id
                 ? "bg-senderBubble text-senderText border-senderBorder"
                 : "bg-receiverBubble text-receiverText border-receiverBorder"
             } message-bubble`}
           >
-            
-          <span><GrLocation className="text-xl"/>
-          <a
-            href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-500 underline ml-2"
-          > Location
-          </a>
-          </span>
-          </div>
-  )}
+            <Linkify>{message.content}</Linkify>
           </div>
         )}
-  
-        
-        {message.messageType !== "text" && (
-          <div className="text-xs text-gray-600"> 
-            {moment(message.timestamp).format("LT")}
+
+        {message.messageType === "file" && (
+          <div
+            className={`${
+              message.sender._id === userInfo.id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
+          >
+            {checkImage(message.fileUrl) ? (
+              <div className="cursor-pointer" onClick={() => { setShowImage(true); setImageUrl(message.fileUrl); }}>
+                <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3"><MdFolderZip /></span>
+                <span>{message.fileUrl.split("/").pop()}</span>
+                <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
+                  <IoMdArrowDown />
+                </span>
+              </div>
+            )}
           </div>
         )}
+
+        {message.messageType === "location" && (
+          <div
+            className={`${
+              message.sender._id === userInfo.id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
+          >
+            <span><GrLocation className="text-xl" />
+              <a href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`} target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-500 underline ml-2">
+                Location
+              </a>
+            </span>
+          </div>
+        )}
+
+        <div className="text-xs text-gray-600">{moment(message.timestamp).format("LT")}</div>
       </div>
     );
   };

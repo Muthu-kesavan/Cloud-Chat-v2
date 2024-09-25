@@ -16,7 +16,7 @@ const setupSocket = (server) => {
   const userSocketMap = new Map();
 
   const disconnect = (socket) => {
-    console.log(`client disconnected: ${socket.id}`);
+    console.log(`Client disconnected: ${socket.id}`);
     for (const [userId, socketId] of userSocketMap.entries()) {
       if (socketId === socket.id) {
         userSocketMap.delete(userId);
@@ -25,83 +25,135 @@ const setupSocket = (server) => {
     }
   };
 
-  const sendMessage = async (message) => {
-    
+  const sendMessage = async (message, callback) => {
+    try {
       const senderSocketId = userSocketMap.get(message.sender);
       const recipientSocketId = userSocketMap.get(message.recipient);
 
-      const createMessage = await Message.create(message);
+      const createdMessage = await Message.create(message);
 
-      const messageData = await Message.findById(createMessage._id)
+      const messageData = await Message.findById(createdMessage._id)
         .populate("sender", "id email name image color")
         .populate("recipient", "id email name image color");
 
-      
       if (recipientSocketId) {
         io.to(recipientSocketId).emit("recieveMessage", messageData);
       }
 
-      
       if (senderSocketId) {
         io.to(senderSocketId).emit("recieveMessage", messageData);
-      }    
-  };
+      }
 
-  const sendChannelMessage =  async(message)=>{
-    const {channelId, sender, content, messageType, fileUrl} = message;
+      if (callback) callback({ status: "ok", messageData });
 
-    const createdMessage = await Message.create({
-      sender,
-      recipient: null,
-      content,
-      messageType,
-      timestamp: new Date(),
-      fileUrl,
-    });
-
-    const messageData = await Message.findById(createdMessage._id)
-    .populate("sender", "id email name image color")
-    .exec();
-
-    await Channel.findByIdAndUpdate(channelId,{
-      $push: {messages: createdMessage._id},
-    });
-
-    const channel = await Channel.findById(channelId)
-    .populate("members");
-
-    const finalData = {...messageData._doc, channelId: channel._id};
-
-    if(channel && channel.members){
-      channel.members.forEach((member)=> {
-        const memberSocketId = userSocketMap.get(member._id.toString());
-        if(memberSocketId){
-          io.to(memberSocketId).emit('recieve-channel-message', finalData);
-        }
-      });
-      const adminSocketId = userSocketMap.get(channel.admin._id.toString());
-        if(adminSocketId){
-          io.to(adminSocketId).emit('recieve-channel-message', finalData);
-        }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      if (callback) callback({ status: "error", error: error.message });
     }
   };
+
+  const sendChannelMessage = async (message, callback) => {
+    try {
+      const { channelId, sender, content, messageType, fileUrl, location } = message;
+
+      const createdMessage = await Message.create({
+        sender,
+        recipient: null,
+        content,
+        messageType,
+        timestamp: new Date(),
+        fileUrl,
+        location,
+      });
+
+      const messageData = await Message.findById(createdMessage._id)
+        .populate("sender", "id email name image color")
+        .exec();
+
+      await Channel.findByIdAndUpdate(channelId, {
+        $push: { messages: createdMessage._id },
+      });
+
+      const channel = await Channel.findById(channelId)
+        .populate("members");
+
+      const finalData = { ...messageData._doc, channelId: channel._id };
+
+      if (channel && channel.members) {
+        channel.members.forEach((member) => {
+          const memberSocketId = userSocketMap.get(member._id.toString());
+          if (memberSocketId) {
+            io.to(memberSocketId).emit('recieve-channel-message', finalData);
+          }
+        });
+
+        const adminSocketId = userSocketMap.get(channel.admin._id.toString());
+        if (adminSocketId) {
+          io.to(adminSocketId).emit('recieve-channel-message', finalData);
+        }
+      }
+
+
+    } catch (error) {
+      console.error("Error sending channel message:", error);
+      if (callback) callback({ status: "error", error: error.message });
+    }
+  };
+
+  // New: Delete message feature
+    // const deleteMessage = async (messageId, callback) => {
+    //   try {
+    //     const message = await Message.findById(messageId);
+
+    //     if (!message) {
+    //       if (callback) callback({ status: "error", error: "Message not found" });
+    //       return;
+    //     }
+
+    //     const senderSocketId = userSocketMap.get(message.sender.toString());
+    //     const recipientSocketId = userSocketMap.get(message.recipient?.toString());
+
+    //     // Remove message from database
+    //     await message.deleteOne();
+
+    //     // Notify both the sender and recipient (if available) about the deleted message
+    //     const deletedMessageData = { messageId, status: "deleted" };
+
+    //     if (recipientSocketId) {
+    //       io.to(recipientSocketId).emit("messageDeleted", deletedMessageData);
+    //     }
+
+    //     if (senderSocketId) {
+    //       io.to(senderSocketId).emit("messageDeleted", deletedMessageData);
+    //     }
+
+    //     // Acknowledge the message deletion
+    //     if (callback) callback({ status: "ok", deletedMessageData });
+
+    //   } catch (error) {
+    //     console.error("Error deleting message:", error);
+    //     if (callback) callback({ status: "error", error: error.message });
+    //   }
+    // };
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
 
     if (userId) {
       userSocketMap.set(userId, socket.id);
-      console.log(`user Connected: ${userId} with ${socket.id}`);
+      console.log(`User connected: ${userId} with socket ${socket.id}`);
     } else {
-      console.log("userId not provided during connection");
+      console.log("UserId not provided during connection");
     }
 
-    
     socket.on("sendMessage", (message, callback) => sendMessage(message, callback));
-    socket.on("send-channel-message", (message, callback)=> sendChannelMessage(message, callback));
+
+    socket.on("send-channel-message", (message, callback) => sendChannelMessage(message, callback));
+
+    //socket.on("deleteMessage", (messageId, callback) => deleteMessage(messageId, callback));
+
     socket.on("disconnect", () => disconnect(socket));
   });
 };
 
 export default setupSocket;
-

@@ -24,7 +24,7 @@ export const MESSAGE_ROUTES = "api/messages"
 export const GET_MESSAGES = `${MESSAGE_ROUTES}/get-messages`
 export const UPLOAD_FILE = `${MESSAGE_ROUTES}/upload`
 export const SHARE_LOCATION = `${MESSAGE_ROUTES}/location` 
-
+export const DELETE_MESSAGE = `${MESSAGE_ROUTES}/:messageId/delete`
 
 
 export const CHANNEL_ROUTES = "api/channel"

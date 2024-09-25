@@ -45,3 +45,32 @@ export const uploadFile = async(req, res)=> {
     return res.status(500).send("Internal Server error");
   }
 };
+
+
+// Delete a message
+export const deleteMessage = async (req, res) => {
+  try {
+    const {messageId} = req.params;
+    const userId = req.userId;  // Assuming you have the user ID from token
+
+    // Find the message
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    // Check if the user is the sender of the message
+    if (message.sender.toString() !== userId) {
+      return res.status(403).json({ message: "You are not authorized to delete this message" });
+    }
+
+    // Delete the message
+    await Message.findByIdAndDelete(messageId);
+
+    return res.status(200).json({ message: "Message deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("Internal Server Error");
+  }
+};

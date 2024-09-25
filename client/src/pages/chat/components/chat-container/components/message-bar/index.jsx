@@ -9,7 +9,7 @@ import { IoSend } from 'react-icons/io5';
 import { RiEmojiStickerLine } from 'react-icons/ri';
 import { apiClient } from '@/lib/api-client';
 import { UPLOAD_FILE } from '@/utils/constants';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent} from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const MessageBar = () => {
@@ -97,6 +97,7 @@ const MessageBar = () => {
   }, [emojiRef]);
 
   const handleEmoji = (emoji) => {
+    console.log("Selected emoji:", emoji.emoji);
     setMessage((msg) => msg + emoji.emoji);
   };
 
@@ -169,13 +170,13 @@ const MessageBar = () => {
   };
 
   const handleLocationClick = () => {
-    // Open the modal and check for geolocation permission
+    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         () => setOpenModal(true),
         (error) => {
           console.error("Error getting location:", error);
-          alert("Please allow location access to use this feature.");
+          alert("Please allow location to access this feature.");
         }
       );
     } else {
@@ -276,7 +277,7 @@ const MessageBar = () => {
             <TooltipTrigger>
               <button
                 className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
-                onClick={() => setEmojiOpen(!emojiOpen)}
+                onClick={() => setEmojiOpen(true)}
                 ref={emojiRef}
               >
                 <RiEmojiStickerLine className="text-2xl" />
@@ -298,12 +299,13 @@ const MessageBar = () => {
       </div>
 
       {emojiOpen && (
-        <div className="absolute z-10">
-          <EmojiPicker onEmojiClick={handleEmoji} />
-        </div>
-      )}
+  <div className="absolute bottom-16 right-0"  ref={emojiRef}>
+    <EmojiPicker theme='dark' open={emojiOpen} onEmojiClick={handleEmoji} autoFocusSearch={false} />
+  </div>
+)}
 
-      <Dialog open={openModal} onOpenChange={setOpenModal}>
+
+      <Dialog open={openModal} onOpenChange={setOpenModal} className="bg-[#5A00EE]">
         <DialogContent>
           <div id="location-map" className="h-96 w-full" />
           <div className="flex justify-between mt-4">
@@ -315,7 +317,7 @@ const MessageBar = () => {
             </button>
             <button
               onClick={handleShareLocation}
-              className="bg-green-500 text-white px-4 py-2 rounded"
+              className="bg-[#5A00EE] text-white px-4 py-2 rounded"
             >
               Share Location
             </button>
