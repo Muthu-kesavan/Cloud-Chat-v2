@@ -13,49 +13,57 @@ export const SocketProvider = ({ children }) => {
   const socket = useRef();
   const { userInfo } = useAppStore();
 
-  
-  useEffect(()=> {
-    if(userInfo){
+  useEffect(() => {
+    if (userInfo) {
       socket.current = io(HOST, {
         withCredentials: true,
-        query: { userId: userInfo.id},
+        query: { userId: userInfo.id },
       });
-      socket.current.on("connect", ()=> {
+
+      socket.current.on("connect", () => {
         console.log("Connected to Socket Server");
       });
 
       const handleRecieveMessage = (message) => {
-        //console.log("Received message from server:", message);
         const { selectedChatType, selectedChatData, addMessage, addContactsInDMContacts } = useAppStore.getState();
-        
-       
+
         if (
           selectedChatType !== undefined &&
           (selectedChatData._id === message.sender._id || selectedChatData._id === message.recipient._id)
         ) {
           addMessage(message);
-        }  
+        }
         addContactsInDMContacts(message);
       };
-    
-      const handleRecieveChannelMessage =(message) =>{
-        const {selectedChatType, selectedChatData, addMessage, addChannelInChannelList} = useAppStore.getState();
-        if(selectedChatType !== undefined  && selectedChatData._id === message.channelId){
+
+      const handleRecieveChannelMessage = (message) => {
+        const { selectedChatType, selectedChatData, addMessage, addChannelInChannelList } = useAppStore.getState();
+        if (selectedChatType !== undefined && selectedChatData._id === message.channelId) {
           addMessage(message);
-        } 
-        addChannelInChannelList(message); 
+        }
+        addChannelInChannelList(message);
       };
-      
+
+      const handleDeleteMessage = ({ messageId, channelId }) => {
+        const { deleteMessage, deleteChannelMessage } = useAppStore.getState();
+        
+        // Check if the message belongs to a channel
+        if (channelId) {
+          deleteChannelMessage(messageId, channelId); // Remove message from the channel and store
+        } else {
+          deleteMessage(messageId); // Remove message from the store
+        }
+      };
+
       socket.current.on("recieveMessage", handleRecieveMessage);
       socket.current.on("recieve-channel-message", handleRecieveChannelMessage);
+      socket.current.on("messageDeleted", handleDeleteMessage); // Listen for message deletion
 
-      return ()=> {
+      return () => {
         socket.current.disconnect();
       };
     }
-  },[userInfo]);
-
-  
+  }, [userInfo]);
 
   return (
     <SocketContext.Provider value={socket.current}>

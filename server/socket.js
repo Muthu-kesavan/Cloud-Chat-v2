@@ -52,6 +52,37 @@ const setupSocket = (server) => {
     }
   };
 
+  const deleteMessage = async (messageId, callback) => {
+    try {
+      const deletedMessage = await Message.findByIdAndDelete(messageId);
+
+      if (!deletedMessage) {
+        return callback({ status: "error", error: "Message not found" });
+      }
+
+      // Notify relevant users (sender and recipient)
+      const senderSocketId = userSocketMap.get(deletedMessage.sender.toString());
+      const recipientSocketId = userSocketMap.get(deletedMessage.recipient.toString());
+
+      // Find the channel ID if applicable (you might have a way to get it)
+      const channelId = deletedMessage.channelId || null; // Assuming channelId is in the message schema
+
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messageDeleted", { messageId, channelId });
+      }
+
+      if (recipientSocketId) {
+        io.to(recipientSocketId).emit("messageDeleted", { messageId, channelId });
+      }
+
+      if (callback) callback({ status: "ok", messageId });
+
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      if (callback) callback({ status: "error", error: error.message });
+    }
+  };
+
   const sendChannelMessage = async (message, callback) => {
     try {
       const { channelId, sender, content, messageType, fileUrl, location } = message;
@@ -74,8 +105,7 @@ const setupSocket = (server) => {
         $push: { messages: createdMessage._id },
       });
 
-      const channel = await Channel.findById(channelId)
-        .populate("members");
+      const channel = await Channel.findById(channelId).populate("members");
 
       const finalData = { ...messageData._doc, channelId: channel._id };
 
@@ -83,58 +113,21 @@ const setupSocket = (server) => {
         channel.members.forEach((member) => {
           const memberSocketId = userSocketMap.get(member._id.toString());
           if (memberSocketId) {
-            io.to(memberSocketId).emit('recieve-channel-message', finalData);
+            io.to(memberSocketId).emit("recieve-channel-message", finalData);
           }
         });
 
         const adminSocketId = userSocketMap.get(channel.admin._id.toString());
         if (adminSocketId) {
-          io.to(adminSocketId).emit('recieve-channel-message', finalData);
+          io.to(adminSocketId).emit("recieve-channel-message", finalData);
         }
       }
-
 
     } catch (error) {
       console.error("Error sending channel message:", error);
       if (callback) callback({ status: "error", error: error.message });
     }
   };
-
-  // New: Delete message feature
-    // const deleteMessage = async (messageId, callback) => {
-    //   try {
-    //     const message = await Message.findById(messageId);
-
-    //     if (!message) {
-    //       if (callback) callback({ status: "error", error: "Message not found" });
-    //       return;
-    //     }
-
-    //     const senderSocketId = userSocketMap.get(message.sender.toString());
-    //     const recipientSocketId = userSocketMap.get(message.recipient?.toString());
-
-    //     // Remove message from database
-    //     await message.deleteOne();
-
-    //     // Notify both the sender and recipient (if available) about the deleted message
-    //     const deletedMessageData = { messageId, status: "deleted" };
-
-    //     if (recipientSocketId) {
-    //       io.to(recipientSocketId).emit("messageDeleted", deletedMessageData);
-    //     }
-
-    //     if (senderSocketId) {
-    //       io.to(senderSocketId).emit("messageDeleted", deletedMessageData);
-    //     }
-
-    //     // Acknowledge the message deletion
-    //     if (callback) callback({ status: "ok", deletedMessageData });
-
-    //   } catch (error) {
-    //     console.error("Error deleting message:", error);
-    //     if (callback) callback({ status: "error", error: error.message });
-    //   }
-    // };
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
@@ -147,10 +140,8 @@ const setupSocket = (server) => {
     }
 
     socket.on("sendMessage", (message, callback) => sendMessage(message, callback));
-
+    socket.on("deleteMessage", (messageId, callback) => deleteMessage(messageId, callback)); // Add deletion event
     socket.on("send-channel-message", (message, callback) => sendChannelMessage(message, callback));
-
-    //socket.on("deleteMessage", (messageId, callback) => deleteMessage(messageId, callback));
 
     socket.on("disconnect", () => disconnect(socket));
   });

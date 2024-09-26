@@ -32,5 +32,28 @@
   border-color: #ffffff33;
 }
 
+.message-container {
+  position: relative;
+}
+
+.message-bubble {
+  position: relative;
+  padding: 10px;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.message-container:hover .delete-icon {
+  opacity: 1;
+}
+
 
 
