@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import Auth from './pages/auth/index'
 import Chat from './pages/chat'
 import Profile from './pages/profile'
+import Social from './pages/social'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppStore } from './store'
 import { apiClient } from './lib/api-client'
 import { GET_USER_INFO } from './utils/constants'
+
 
 const PrivateRoute = ({children})=> {
   const {userInfo} = useAppStore();
@@ -56,6 +58,7 @@ const App = () => {
       <Route path='/auth' element={<AuthRoute><Auth /></AuthRoute>} />
       <Route path='/chat' element={<PrivateRoute><Chat /></PrivateRoute>} />
       <Route path='/profile' element={<PrivateRoute><Profile /></PrivateRoute>} />
+      <Route path='/social' element={<PrivateRoute><Social /></PrivateRoute>} />
       <Route path='*' element={<Navigate to="/auth" />}/>
     </Routes>
     </BrowserRouter>

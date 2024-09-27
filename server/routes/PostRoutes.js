@@ -7,7 +7,7 @@ const postRoutes = Router();
 
 const upload = multer({dest:"uploads/posts"});
 
-postRoutes.post('/', verifyToken, upload.single('file'), createPost);
+postRoutes.post('/post', verifyToken, upload.single('file'), createPost);
 postRoutes.delete('/:postId', verifyToken, deletePost);
 postRoutes.patch('/:postId/like', verifyToken, likeOrDislike);
 postRoutes.post('/:postId/reply', verifyToken, replyToPost);

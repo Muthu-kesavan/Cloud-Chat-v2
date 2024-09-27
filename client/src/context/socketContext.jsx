@@ -45,7 +45,7 @@ export const SocketProvider = ({ children }) => {
       };
 
       const handleDeleteMessage = ({ messageId, channelId }) => {
-        const { deleteMessage, deleteChannelMessage } = useAppStore.getState();
+        const { deleteMessage, deleteChannelMessage } = useAppStore();
         
         // Check if the message belongs to a channel
         if (channelId) {

@@ -31,3 +31,10 @@ export const CHANNEL_ROUTES = "api/channel"
 export const CREATE_CHANNEL = `${CHANNEL_ROUTES}/create-channel`
 export const GET_USER_CHANNELS = `${CHANNEL_ROUTES}/get-user-channels`
 export const GET_CHANNEL_MESSAGES = `${CHANNEL_ROUTES}/channel-messages`
+
+
+export const POST_ROUTES =  "api/post"
+export const CREATE_POST = `${POST_ROUTES}/post`
+export const GET_FEED = `${POST_ROUTES}/feed`
+export const SAVE_POST = `${POST_ROUTES}/:postId/save`
+export const GET_SAVED_POST = `${POST_ROUTES}/saved`

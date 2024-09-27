@@ -87,13 +87,13 @@ export const createChatSlice = (set, get) => ({
     );
     set({ selectedChatMessages: updatedMessages });
   },
-
+  
   deleteChannelMessage: (messageId, channelId) => {
     const selectedChatMessages = get().selectedChatMessages;
     const updatedMessages = selectedChatMessages.filter(
       (message) => message._id !== messageId
     );
-
+  
     const channels = get().channels;
     const updatedChannels = channels.map(channel => {
       if (channel._id === channelId) {
@@ -106,7 +106,8 @@ export const createChatSlice = (set, get) => ({
       }
       return channel;
     });
-
+  
     set({ selectedChatMessages: updatedMessages, channels: updatedChannels });
   },
+  
 });
