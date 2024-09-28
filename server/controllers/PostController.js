@@ -145,9 +145,7 @@ export const getCommentsByPost = async (req, res) => {
 
 export const getFeed = async (req, res) => {
   try {
-    const feeds = await Post.find({
-      likes: { $exists: true, $ne: [] }, 
-    }).sort({ likes: -1 });
+    const feeds = await Post.find({}).sort({ likes: -1 });
 
     res.status(200).json({ message: "Feeds fetched successfully", count: feeds.length, feeds });
   } catch (err) {

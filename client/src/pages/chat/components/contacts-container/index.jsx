@@ -36,7 +36,7 @@ const ContactsContainer = () => {
 
  
   const handleExplore = () => {
-    navigate('/social'); 
+    navigate('/explore'); 
   };
 
   return (
