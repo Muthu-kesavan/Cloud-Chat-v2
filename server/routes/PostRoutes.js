@@ -10,7 +10,7 @@ const upload = multer({dest:"uploads/posts"});
 postRoutes.post('/post', verifyToken, upload.single('file'), createPost);
 postRoutes.delete('/:postId', verifyToken, deletePost);
 postRoutes.patch('/:postId/like', verifyToken, likeOrDislike);
-postRoutes.post('/:postId/reply', verifyToken, replyToPost);
+postRoutes.put('/:postId/reply', verifyToken, replyToPost);
 postRoutes.get('/:postId/comments', verifyToken, getCommentsByPost);
 postRoutes.get('/feed', verifyToken, getFeed);
 postRoutes.get('/:postId/share', verifyToken, sharePost);

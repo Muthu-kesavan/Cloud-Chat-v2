@@ -1,69 +1,177 @@
 import { apiClient } from "@/lib/api-client";
-import { GET_FEED, LIKE_DISLIKE_POST, DELETE_POST, SAVE_OR_UNSAVE_POST } from "@/utils/constants";
+import Cookies from 'js-cookie';
+import { 
+  CREATE_POST, 
+  DELETE_POST, 
+  LIKE_DISLIKE_POST, 
+  REPLY_TO_POST, 
+  GET_POST_COMMENTS, 
+  GET_FEED, 
+  GET_SAVED_POSTS, 
+  SHARE_POST, 
+  SAVE_OR_UNSAVE_POST, 
+  GET_USER_POSTS 
+} from "@/utils/constants";
 
 export const createSocialSlice = (set, get) => ({
   posts: [],
+  comments: [],
+  savedPosts: [],
   loading: false,
   error: null,
 
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
+  // Helper function to get the token from cookies
+  getToken: () => {
+    return Cookies.get('jwt'); // Use the name you set for the cookie
+  },
 
-  fetchPosts: async () => {
-    set({ loading: true, error: null });
+  fetchFeed: async () => {
+    const token = get().getToken();
+    set({ loading: true });
     try {
-      const response = await apiClient.get(GET_FEED, { withCredentials: true });
-      set({ posts: response.data.feeds, loading: false });
+      const response = await apiClient.get(GET_FEED, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set({ posts: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
     }
   },
 
-  toggleLikePost: async (postId, userId) => {
+  createPost: async (postData) => {
+    const token = get().getToken();
+    set({ loading: true });
     try {
-      await apiClient.patch(LIKE_DISLIKE_POST(postId), {}, { withCredentials: true });
-      const currentPosts = get().posts;
-      const post = currentPosts.find((p) => p._id === postId);
-      const isLiked = post.likes.includes(userId);
+      const response = await apiClient.post(CREATE_POST, postData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       set((state) => ({
-        posts: state.posts.map((p) =>
-          p._id === postId
-            ? { ...p, likes: isLiked ? p.likes.filter((id) => id !== userId) : [...p.likes, userId] }
-            : p
-        ),
+        posts: [response.data, ...state.posts],
+        loading: false,
       }));
     } catch (error) {
-      console.error('Error toggling like', error);
+      set({ error: error.message, loading: false });
     }
   },
 
   deletePost: async (postId) => {
+    const token = get().getToken();
+    set({ loading: true });
     try {
-      await apiClient.delete(DELETE_POST(postId), {}, { withCredentials: true });
+      await apiClient.delete(DELETE_POST(postId), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       set((state) => ({
         posts: state.posts.filter((post) => post._id !== postId),
+        loading: false,
       }));
-      toast.success('Post deleted successfully');
     } catch (error) {
-      toast.error('Error deleting post');
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  likePost: async (postId) => {
+    const token = get().getToken();
+    try {
+      const response = await apiClient.post(LIKE_DISLIKE_POST(postId), {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set((state) => ({
+        posts: state.posts.map((post) =>
+          post._id === postId ? { ...post, likes: response.data.likes } : post
+        ),
+      }));
+    } catch (error) {
+      set({ error: error.message });
+    }
+  },
+
+  replyToPost: async (postId, replyData) => {
+    const token = get().getToken();
+    set({ loading: true });
+    try {
+      const response = await apiClient.post(REPLY_TO_POST(postId), replyData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set((state) => ({
+        comments: [...state.comments, response.data],
+        loading: false,
+      }));
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  getComments: async (postId) => {
+    const token = get().getToken();
+    set({ loading: true });
+    try {
+      const response = await apiClient.get(GET_POST_COMMENTS(postId), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set({ comments: response.data, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
     }
   },
 
   saveOrUnsavePost: async (postId) => {
+    const token = get().getToken();
+    set({ loading: true });
     try {
-      await apiClient.patch(SAVE_OR_UNSAVE_POST(postId), {}, { withCredentials: true });
-      const currentPosts = get().posts;
-      const post = currentPosts.find((p) => p._id === postId);
+      const response = await apiClient.post(SAVE_OR_UNSAVE_POST(postId), {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       set((state) => ({
-        posts: state.posts.map((p) =>
-          p._id === postId
-            ? { ...p, isSaved: !post.isSaved }
-            : p
-        ),
+        savedPosts: response.data.saved ? [...state.savedPosts, response.data] : state.savedPosts.filter(post => post._id !== postId),
+        loading: false,
       }));
-      toast.success(post.isSaved ? 'Post unsaved' : 'Post saved');
     } catch (error) {
-      toast.error('Error saving post');
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  fetchSavedPosts: async () => {
+    const token = get().getToken();
+    set({ loading: true });
+    try {
+      const response = await apiClient.get(GET_SAVED_POSTS, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set({ savedPosts: response.data, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  fetchUserPosts: async () => {
+    const token = get().getToken();
+    set({ loading: true });
+    try {
+      const response = await apiClient.get(GET_USER_POSTS, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set({ posts: response.data, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  sharePost: async (postId) => {
+    const token = get().getToken();
+    set({ loading: true });
+    try {
+      const response = await apiClient.post(SHARE_POST(postId), {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set((state) => ({
+        posts: state.posts.map((post) => 
+          post._id === postId ? { ...post, shared: response.data.shared } : post
+        ),
+        loading: false,
+      }));
+    } catch (error) {
+      set({ error: error.message, loading: false });
     }
   },
 });

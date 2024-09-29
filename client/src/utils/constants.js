@@ -10,7 +10,7 @@ export const UPDATE_PROFILE = `${AUTH_ROUTES}/update-profile`
 export const UPLOAD_IMAGE = `${AUTH_ROUTES}/upload-image`
 export const REMOVE_IMAGE = `${AUTH_ROUTES}/remove-image`
 export const LOGOUT = `${AUTH_ROUTES}/logout`
-
+export const GET_USER = `${AUTH_ROUTES}/find/:id`
 
 
 export const CONTACT_ROUTES = "api/contacts"

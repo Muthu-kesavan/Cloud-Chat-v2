@@ -199,19 +199,33 @@ export const saveOrUnsavePost = async(req, res)=>{
   }
 };
 
+
+
 export const getSavedPosts = async (req, res) => {
   try {
     const userId = req.userId;
 
+    // Fetch user with populated saved posts
     const user = await User.findById(userId).populate("savedPosts");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.status(200).json({ savedPosts: user.savedPosts });
+
+    // Fetch all posts or modify to fetch specific posts based on your needs
+    const posts = await Post.find();
+
+    // Map through the posts to add isSaved property
+    const postsWithSavedStatus = posts.map(post => ({
+      ...post.toObject(),
+      isSaved: user.savedPosts.some(savedPost => savedPost._id.toString() === post._id.toString())
+    }));
+
+    res.status(200).json({ savedPosts: postsWithSavedStatus }); // Adjust the response structure as needed
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const getUserPosts = async (req, res) => {
   try {

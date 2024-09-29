@@ -270,3 +270,13 @@ export const logout = async(req, res)=>{
     return res.status(500).send("Internal Server Error");
   }
 };
+
+export const getUser = async(req, res)=>{
+  try{
+    const user = await User.findById(req.params.id);
+    res.status(200).json(user);
+  }catch(err){
+    console.log({err});
+    return res.status(500).send("Internal Server error");
+  }
+}
