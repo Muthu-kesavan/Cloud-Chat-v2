@@ -11,6 +11,7 @@ import {
   SHARE_POST, 
   SAVE_OR_UNSAVE_POST, 
   GET_USER_POSTS 
+  
 } from "@/utils/constants";
 
 export const createSocialSlice = (set, get) => ({
@@ -29,10 +30,9 @@ export const createSocialSlice = (set, get) => ({
     const token = get().getToken();
     set({ loading: true });
     try {
-      const response = await apiClient.get(GET_FEED, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ posts: response.data, loading: false });
+      const response = await apiClient.get(GET_FEED, { withCredentials: true });
+      set({ posts: response.data.feeds, loading: false });
+      //console.log(response.data.feeds);
     } catch (error) {
       set({ error: error.message, loading: false });
     }
@@ -71,18 +71,20 @@ export const createSocialSlice = (set, get) => ({
   },
 
   likePost: async (postId) => {
-    const token = get().getToken();
+    const token = get().getToken(); 
     try {
-      const response = await apiClient.post(LIKE_DISLIKE_POST(postId), {}, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await apiClient.patch(LIKE_DISLIKE_POST(postId), {}, {
+        withCredentials: true, 
       });
+      const updatedPost = response.data.post;
+
       set((state) => ({
         posts: state.posts.map((post) =>
-          post._id === postId ? { ...post, likes: response.data.likes } : post
+          post._id === postId ? { ...post, likes: updatedPost.likes } : post
         ),
       }));
     } catch (error) {
-      set({ error: error.message });
+      set({ error: error.message }); 
     }
   },
 
@@ -90,9 +92,7 @@ export const createSocialSlice = (set, get) => ({
     const token = get().getToken();
     set({ loading: true });
     try {
-      const response = await apiClient.post(REPLY_TO_POST(postId), replyData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiClient.post(REPLY_TO_POST(postId), replyData, {withCredentials: true});
       set((state) => ({
         comments: [...state.comments, response.data],
         loading: false,
@@ -103,41 +103,44 @@ export const createSocialSlice = (set, get) => ({
   },
 
   getComments: async (postId) => {
-    const token = get().getToken();
-    set({ loading: true });
-    try {
-      const response = await apiClient.get(GET_POST_COMMENTS(postId), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ comments: response.data, loading: false });
-    } catch (error) {
-      set({ error: error.message, loading: false });
-    }
-  },
+  const token = get().getToken();
+  set({ loading: true });
+  try {
+    const response = await apiClient.get(GET_POST_COMMENTS(postId), { withCredentials: true });
+    set((state) => ({
+      comments: { ...state.comments, [postId]: response.data.replies }, // Store comments by postId
+      loading: false
+    }));
+  } catch (error) {
+    set({ error: error.message, loading: false });
+  }
+},
+
 
   saveOrUnsavePost: async (postId) => {
     const token = get().getToken();
     set({ loading: true });
+  
     try {
-      const response = await apiClient.post(SAVE_OR_UNSAVE_POST(postId), {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiClient.patch(SAVE_OR_UNSAVE_POST(postId),{}, { withCredentials: true });
+  
+      const updatedSavedPosts = response.data.savedPosts;  
+  
       set((state) => ({
-        savedPosts: response.data.saved ? [...state.savedPosts, response.data] : state.savedPosts.filter(post => post._id !== postId),
+        savedPosts: updatedSavedPosts,  
         loading: false,
       }));
     } catch (error) {
       set({ error: error.message, loading: false });
     }
   },
+  
 
   fetchSavedPosts: async () => {
     const token = get().getToken();
     set({ loading: true });
     try {
-      const response = await apiClient.get(GET_SAVED_POSTS, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiClient.get(GET_SAVED_POSTS, {withCredentials: true});
       set({ savedPosts: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });

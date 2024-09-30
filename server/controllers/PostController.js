@@ -2,6 +2,7 @@ import { renameSync, unlinkSync } from 'fs';
 import Post from "../models/PostModel.js";
 import User from '../models/UserModel.js';
 
+
 export const createPost = async (req, res) => {
   try {
     const { description } = req.body;
@@ -10,21 +11,35 @@ export const createPost = async (req, res) => {
     const userId = req.userId;
     let post;
 
-    let picturePath = null;
+    let mediaPath = null;
+    let isVideo = false;
+
     if (file) {
       const date = Date.now();
       const fileName = `uploads/posts/${date}-${file.originalname}`;
-      
+    
       renameSync(file.path, fileName);
-      picturePath = fileName;
+      mediaPath = fileName;
+
+      const mimeType = file.mimetype;
+      if (mimeType.startsWith('video/')) {
+        isVideo = true;  
+      }
     }
 
-    if (description && picturePath) {
-      post = new Post({ userId, description, picture: picturePath });
+    if (description && mediaPath) {
+      post = new Post({
+        userId,
+        description,
+        ...(isVideo ? { video: mediaPath } : { picture: mediaPath })
+      });
     } else if (description) {
       post = new Post({ userId, description });
-    } else if (picturePath) {
-      post = new Post({ userId, picture: picturePath });
+    } else if (mediaPath) {
+      post = new Post({
+        userId,
+        ...(isVideo ? { video: mediaPath } : { picture: mediaPath })
+      });
     } else {
       return res.status(422).json({ error: "Please add either text or a media file (picture or video)" });
     }
@@ -74,7 +89,7 @@ export const deletePost = async(req, res)=> {
 
 export const likeOrDislike = async (req, res) => {
   try {
-    const {postId} = req.params;
+    const { postId } = req.params;
     const userId = req.userId; 
 
     const post = await Post.findById(postId); 
@@ -87,17 +102,18 @@ export const likeOrDislike = async (req, res) => {
     if (!liked) {
       post.likes.push(userId);
       await post.save(); 
-      return res.status(200).json("Post has been liked");
+      return res.status(200).json({ message: "Post has been liked", post }); // Return updated post
     } else {
       post.likes.pull(userId); 
       await post.save(); 
-      return res.status(200).json("Post has been disliked");
+      return res.status(200).json({ message: "Post has been disliked", post }); // Return updated post
     }
   } catch (err) {
     console.error(err); 
     return res.status(500).send("Internal Server Error" );
   }
 };
+
 
 export const replyToPost = async (req, res) => {
   try {
@@ -171,10 +187,10 @@ export const sharePost = async (req, res) => {
   }
 };
 
-export const saveOrUnsavePost = async(req, res)=>{
+export const saveOrUnsavePost = async (req, res) => {
   try {
     const userId = req.userId; 
-    const {postId} = req.params;
+    const { postId } = req.params;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -185,19 +201,28 @@ export const saveOrUnsavePost = async(req, res)=>{
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
+
+    let message;
     if (user.savedPosts.includes(postId)) {
-      user.savedPosts = user.savedPosts.filter(id => id.toString() !== postId);
-      await user.save();
-      return res.status(200).json({ message: "Post unsaved successfully" });
+      user.savedPosts = user.savedPosts.filter((id) => id.toString() !== postId);
+      message = "Post unsaved successfully";
     } else {
       user.savedPosts.push(postId);
-      await user.save();
-      return res.status(200).json({ message: "Post saved successfully" });
+      message = "Post saved successfully";
     }
+
+    await user.save();
+
+    // Return updated savedPosts list to the frontend
+    return res.status(200).json({
+      message,
+      savedPosts: user.savedPosts,  // Returning updated saved posts
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 

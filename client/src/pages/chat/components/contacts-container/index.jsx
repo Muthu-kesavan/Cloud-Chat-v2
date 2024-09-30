@@ -110,8 +110,6 @@ const ContactsContainer = () => {
           </div>
         )}
       </div>
-
-      {/* Profile info at the bottom */}
       <ProfileInfo />
     </div>
   );
