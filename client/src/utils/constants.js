@@ -44,5 +44,6 @@ export const GET_POST_COMMENTS = (postId) => `${POST_ROUTES}/${postId}/comments`
 export const GET_FEED = `${POST_ROUTES}/feed`;
 export const GET_SAVED_POSTS = `${POST_ROUTES}/saved`;
 export const SHARE_POST = (postId) => `${POST_ROUTES}/${postId}/share`;
+export const POST_SAVE_OR_UNSAVE = (postId)=> `${POST_ROUTES}/${postId}/save`;
 export const SAVE_OR_UNSAVE_POST = (postId) => `${POST_ROUTES}/${postId}/save`;
 export const GET_USER_POSTS = `${POST_ROUTES}/myPosts`;

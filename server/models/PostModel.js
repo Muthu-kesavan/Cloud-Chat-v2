@@ -18,8 +18,14 @@ video: {
 
 likes: {
     type: Array,
-    defaultValue: [],
+    default: [],
 },
+
+saved: {
+  type: Array,
+  default: [],
+},
+
 replies: [
   {
       userId: {
@@ -36,6 +42,9 @@ replies: [
       },
       name: {
           type: String,
+      },
+      color: {
+        type: Number,
       },
   },
 ],

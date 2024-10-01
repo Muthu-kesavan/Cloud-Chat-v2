@@ -97,7 +97,6 @@ const MessageBar = () => {
   }, [emojiRef]);
 
   const handleEmoji = (emoji) => {
-    console.log("Selected emoji:", emoji.emoji);
     setMessage((msg) => msg + emoji.emoji);
   };
 

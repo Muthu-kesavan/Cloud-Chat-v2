@@ -132,8 +132,9 @@ export const replyToPost = async (req, res) => {
 
     const reply = { userId, text };
     post.replies.push(reply);
-    
     await post.save(); 
+
+    const updatedPost = await Post.findById(postId);
 
     res.status(200).json({ message: "Reply added successfully", reply });
   } catch (err) {
@@ -145,14 +146,14 @@ export const replyToPost = async (req, res) => {
 export const getCommentsByPost = async (req, res) => {
   try {
     const {postId} = req.params;
-    const post = await Post.findById(postId).populate("replies.userId", "username profilePicture"); // Ensure the field name is correct
+    const post = await Post.findById(postId).populate("replies.userId", "name image color"); // Ensure the field name is correct
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    const replies = post.replies; 
-    res.status(200).json({ message: "Replies fetched successfully", replies });
+    const comments = post.replies; 
+    res.status(200).json({ message: "Replies fetched successfully", comments });
   } catch (err) {
     console.error(err); 
     res.status(500).send("Internal Server Error");
@@ -262,5 +263,36 @@ export const getUserPosts = async (req, res) => {
     res.status(200).json({ posts: userPosts });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const PostSaveorUnsave = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const post = await Post.findById(postId); 
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const savedPost = post.saved.includes(userId);
+
+    if (!savedPost) {
+      post.saved.push(userId);
+      await post.save();
+      return res.status(200).json({ message: "Post has been saved", post });
+    } else {
+      post.saved.pull(userId);
+      await post.save();
+      return res.status(200).json({ message: "Post has been Unsaved", post });
+    }
+  } catch (err) {
+    console.error(err); 
+    return res.status(500).send("Internal Server Error");
   }
 };
