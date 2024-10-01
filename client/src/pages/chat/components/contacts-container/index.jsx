@@ -39,6 +39,10 @@ const ContactsContainer = () => {
     navigate('/explore'); 
   };
 
+  const handleUserPost =()=>{
+    navigate('/lets-post');
+  }
+
   return (
     <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
       <div className="pt-3">
@@ -46,13 +50,15 @@ const ContactsContainer = () => {
       </div>
       
       <div className="my-5">
-        <div className="flex items-center justify-between pr-10">
+        <div className="flex items-center justify-between pr-10 cursor-pointer" 
+          onClick={handleUserPost}  >
           <Title text="Let's Post" />
           <div className="flex items-center">
             <TbWriting 
               className="text-neutral-400 font-light text-3xl text-opacity-90 text-start cursor-pointer transition-transform duration-300 hover:translate-x-[10px] hover:text-neutral-100 ml-0"
             />
           </div>
+        
         </div>
       </div>
 

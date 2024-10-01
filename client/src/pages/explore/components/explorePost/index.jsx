@@ -4,7 +4,7 @@ import ExploreContent from '../exploreContent';
 import { useAppStore } from '@/store';
 
 const ExplorePost = () => {
-  const { posts, loading, error } = useAppStore(); 
+  const { loading, error } = useAppStore(); 
   return (
     <div className="fixed top-0 left-0 h-screen w-full bg-[#1c1d25] flex flex-col md:static md:flex-1">
       <ExploreHeader />

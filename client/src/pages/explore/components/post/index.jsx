@@ -16,7 +16,6 @@ const Post = ({ post }) => {
     userInfo,
     likePost,
     postSaveorUnsave,
-    replyToPost,
   } = useAppStore(); 
 
   const [userData, setUserData] = useState(null);
@@ -28,7 +27,6 @@ const Post = ({ post }) => {
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
-  console.log(comments);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -174,13 +172,13 @@ const Post = ({ post }) => {
           <span>{post.likes?.length || 0}</span>
         </button>
   
-        {/* Move comments button here */}
+
         <button onClick={handleToggleComments} className="flex items-center space-x-2">
           <FaRegComment className="hover:scale-125 transition-transform duration-200" />
           <span>{commentCount}</span>
         </button>
   
-        {/* Save button moved to third */}
+
         <button onClick={handleSavePost} className="flex items-center space-x-2">
           {isSaving ? (
             <span>Saving...</span>
@@ -194,18 +192,18 @@ const Post = ({ post }) => {
       </div>
   
       {showComments && (
-  <div className="comments mt-4 border-t border-[#5A00EE] pt-4">
-    <div className="max-h-40 overflow-y-auto">
-      {comments && comments.length > 0 ? (
-        comments.map((comment) => (
-          <div key={comment._id} className="border-t py-2">
-            <p className="font-semibold">{comment.userId.name}</p>
-            <p className="text-gray-400">{comment.text}</p>
-          </div>
-        ))
-      ) : (
-        <p className="text-gray-500">No comments yet</p>
-      )}
+          <div className="comments mt-4 border-t border-[#5A00EE] pt-4">
+            <div className="max-h-40 overflow-y-auto">
+              {comments && comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id} className="border-t py-2">
+                    <p className="font-semibold">{comment.userId.name}</p>
+                    <p className="text-gray-400">{comment.text}</p>
+                  </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No comments yet</p>
+            )}
     </div>
 
     <div className="flex items-center mt-2">

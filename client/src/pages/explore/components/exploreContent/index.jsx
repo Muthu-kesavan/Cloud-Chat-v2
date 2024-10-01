@@ -4,8 +4,6 @@ import Post from '../post';
 
 const ExploreContent = () => {
   const { posts, loading, error } = useAppStore(); 
-  console.log(posts);
-
   if (error) {
     return <p>Error fetching posts: {error.message}</p>;
   }

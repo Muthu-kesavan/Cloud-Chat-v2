@@ -15,6 +15,7 @@ import {
 } from "@/utils/constants";
 
 export const createSocialSlice = (set, get) => ({
+  userPosts: [],
   posts: [],
   comments: [],
   commentCount: 0,
@@ -123,22 +124,32 @@ export const createSocialSlice = (set, get) => ({
       set({ error: err.message, loading: false });
     }
 },
-postSaveorUnsave: async (postId) => {
-  try {
-    const response = await apiClient.patch(POST_SAVE_OR_UNSAVE(postId), {}, {
-      withCredentials: true, 
-    });
-    const updatedPost = response?.data?.post;
+  postSaveorUnsave: async (postId) => {
+    try {
+      const response = await apiClient.patch(POST_SAVE_OR_UNSAVE(postId), {}, {
+        withCredentials: true, 
+      });
+      const updatedPost = response?.data?.post;
 
-    if (updatedPost) {
-      set((state) => ({
-        posts: state.posts.map((post) =>
-          post._id === postId ? { ...post, saved: updatedPost.saved } : post
-        ),
-      }));
+      if (updatedPost) {
+        set((state) => ({
+          posts: state.posts.map((post) =>
+            post._id === postId ? { ...post, saved: updatedPost.saved } : post
+          ),
+        }));
+      }
+    } catch (error) {
+      set({ error: error.message }); 
     }
-  } catch (error) {
-    set({ error: error.message }); 
+  },
+  getUserPost: async()=>{
+    set({loading: true});
+    try{
+      const res = await apiClient.get(GET_USER_POSTS, {withCredentials: true});
+      set({userPosts: res.data?.posts, loading: false})
+    }catch(err){
+      console.error({err});
+      set({error: err.message, loading: false});
+    }
   }
-}
 });

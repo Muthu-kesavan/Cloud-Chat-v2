@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react'
 import Auth from './pages/auth/index'
 import Chat from './pages/chat'
 import Profile from './pages/profile'
+import Explore from './pages/explore'
+import CreatePost from './pages/createPost'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppStore } from './store'
 import { apiClient } from './lib/api-client'
 import { GET_USER_INFO } from './utils/constants'
-import Explore from './pages/explore'
+
 
 
 const PrivateRoute = ({children})=> {
@@ -34,7 +36,6 @@ const App = () => {
       }else{
         setUserInfo(undefined);
       }
-      //console.log({res});
     }catch(err){
       setUserInfo(undefined);
       console.log({err});
@@ -59,6 +60,7 @@ const App = () => {
       <Route path='/chat' element={<PrivateRoute><Chat /></PrivateRoute>} />
       <Route path='/profile' element={<PrivateRoute><Profile /></PrivateRoute>} />
       <Route path='/explore' element={<PrivateRoute><Explore /></PrivateRoute>} /> 
+      <Route  path='/lets-post' element={<PrivateRoute><CreatePost /></PrivateRoute>}/>
       <Route path='*' element={<Navigate to="/auth" />}/>
     </Routes>
     </BrowserRouter>

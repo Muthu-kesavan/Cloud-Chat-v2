@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { InputOTP, InputOTPGroup,InputOTPSlot,} from "@/components/ui/input-otp"
 import { useState } from "react"
@@ -16,8 +17,18 @@ const Auth = () => {
   const [otp, setOtp] = useState('');
   const [isOTPSent, setIsOTPSent] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const {setUserInfo} = useAppStore();
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const validateSignup = () => {
     if (!email.length) {
@@ -141,8 +152,26 @@ const Auth = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent className="flex flex-col gap-5 mt-10" value="login">
-                <Input placeholder="Email" type="email" className="rounded-full p-6" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <Input placeholder="Password" type="password" className="rounded-full p-6" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input placeholder="Email" 
+                type="email" 
+                className="rounded-full p-6 caret-[#5A00EE]" 
+                style={{ caretColor: '#5A00EE' }} 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} />
+                <div className="relative">
+                  <Input
+                    placeholder="Password"
+                    type={showPassword ? "text" : "password"}
+                    className="rounded-full p-6 caret-[#5A00EE]" 
+                    style={{ caretColor: '#5A00EE' }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <IoMdEye
+                    className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
+                    onClick={togglePassword}
+                  />
+                </div>
                 <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleLogin}>
                   Login
                 </Button>
@@ -151,25 +180,48 @@ const Auth = () => {
                 {!isOTPSent ? (
                   <>
                     <Input placeholder="Email" type="email" className="rounded-full p-6" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <Input placeholder="Password" type="password" className="rounded-full p-6" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <Input placeholder="Confirm Password" type="password" className="rounded-full p-6" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                    <div className="relative">
+                      <Input
+                        placeholder="Password"
+                        type={showPassword ? "text" : "password"}
+                        className="rounded-full p-6 caret-[#5A00EE]" 
+                        style={{ caretColor: '#5A00EE' }}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <IoMdEye
+                        className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
+                        onClick={togglePassword}
+                      />
+                    </div>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Confirm Password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        className="rounded-full p-6 caret-[#5A00EE]" 
+                        style={{ caretColor: '#5A00EE' }}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                      <IoMdEye 
+                        className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showConfirmPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
+                        onClick={toggleConfirmPassword}
+                      />
+                    </div>
                     <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleSignup}>
                       Signup
                     </Button>
                   </>
                 ) : (
                   <>
-                   
-                    <InputOTP maxLength={6} value={otp} onChange={handleOtpChange} className="rounded-full p-6">
-                    <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                      </InputOTPGroup>
-                    </InputOTP>
+                    <InputOTPGroup >
+                      <InputOTPSlot onChange={handleOtpChange} value={otp[0]} />
+                      <InputOTPSlot onChange={handleOtpChange} value={otp[1]} />
+                      <InputOTPSlot onChange={handleOtpChange} value={otp[2]} />
+                      <InputOTPSlot onChange={handleOtpChange} value={otp[3]} />
+                      <InputOTPSlot onChange={handleOtpChange} value={otp[4]} />
+                      <InputOTPSlot onChange={handleOtpChange} value={otp[5]} />
+                    </InputOTPGroup>
                     <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleVerifyOTP}>
                       Verify OTP
                     </Button>
@@ -179,8 +231,8 @@ const Auth = () => {
             </Tabs>
           </div>
         </div>
-        <div className="hidden xl:flex justify-center items-center">
-              <img src={bgimage3} alt="image" className="h-[500px] w-[600px] rounded-lg" />
+        <div className="bg-[#5A00EE] h-full w-full bg-cover bg-center rounded-r-3xl relative" style={{ backgroundImage: `url(${bgimage3})` }}>
+          <div className="absolute w-full h-full bg-black opacity-30"></div>
         </div>
       </div>
     </div>
