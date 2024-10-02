@@ -5,7 +5,6 @@ import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import formatDistance from "date-fns/formatDistance";
 import { IoBookmark, IoBookmarkOutline } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
-import { BsSend } from "react-icons/bs";
 import { GET_POST_COMMENTS, GET_USER, HOST, REPLY_TO_POST } from "@/utils/constants";
 import { apiClient } from "@/lib/api-client";
 import { getColor } from "@/lib/utils";
@@ -22,11 +21,12 @@ const Post = ({ post }) => {
   const [enlargePicture, setEnlargePicture] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [replyText, setReplyText]= useState('');
+  const [replyText, setReplyText] = useState('');
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,28 +39,28 @@ const Post = ({ post }) => {
     fetchData();
   }, [post.userId]);
 
-  useEffect(()=>{
-    const fetchCommentCount = async()=>{
-      try{
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
         const res = await apiClient.get(GET_POST_COMMENTS(post._id), { withCredentials: true });
         setCommentCount(res.data?.comments?.length || 0);
-      }catch(err){
+      } catch (err) {
         console.log(err);
       }
     };
     fetchCommentCount();
   }, [post._id]);
 
-  useEffect(()=>{
-    const fetchComments = async()=>{
-      try{
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
         const fetchedComments = await apiClient.get(GET_POST_COMMENTS(post._id), { withCredentials: true });
         setComments(fetchedComments.data?.comments || []);
-      }catch(err){
+      } catch (err) {
         console.error(err);
       }
     };
-    if (showComments){
+    if (showComments) {
       fetchComments();
     }
   }, [post._id, showComments]);
@@ -69,23 +69,22 @@ const Post = ({ post }) => {
     await likePost(post._id);
   };
 
-
   const handleSavePost = async () => {
     setIsSaving(true);
     await postSaveorUnsave(post._id);
     setIsSaving(false);
   };
 
-  const handleAddComment = async()=> {
-    try{
+  const handleAddComment = async () => {
+    try {
       await apiClient.put(REPLY_TO_POST(post._id),
-        {text: replyText},
-       {withCredentials: true}
-    );
-    const fetchedComments = await apiClient.get(GET_POST_COMMENTS(post._id), { withCredentials: true });
-        setComments(fetchedComments.data?.replies || []);
-        setReplyText('');
-    }catch(err){
+        { text: replyText },
+        { withCredentials: true }
+      );
+      const fetchedComments = await apiClient.get(GET_POST_COMMENTS(post._id), { withCredentials: true });
+      setComments(fetchedComments.data?.comments || []);
+      setReplyText('');
+    } catch (err) {
       console.error(err);
     }
   };
@@ -98,9 +97,9 @@ const Post = ({ post }) => {
     setShowProfile(!showProfile);
   };
 
-  const handleToggleComments = ()=> {
+  const handleToggleComments = () => {
     setShowComments(!showComments);
-  }
+  };
 
   return (
     <div className="p-4 border border-gray-200 rounded-md shadow-lg mb-6 transition-shadow hover:shadow-xl">
@@ -172,13 +171,11 @@ const Post = ({ post }) => {
           <span>{post.likes?.length || 0}</span>
         </button>
   
-
         <button onClick={handleToggleComments} className="flex items-center space-x-2">
           <FaRegComment className="hover:scale-125 transition-transform duration-200" />
           <span>{commentCount}</span>
         </button>
   
-
         <button onClick={handleSavePost} className="flex items-center space-x-2">
           {isSaving ? (
             <span>Saving...</span>
@@ -192,35 +189,65 @@ const Post = ({ post }) => {
       </div>
   
       {showComments && (
-          <div className="comments mt-4 border-t border-[#5A00EE] pt-4">
-            <div className="max-h-40 overflow-y-auto">
-              {comments && comments.length > 0 ? (
-                comments.map((comment) => (
-                  <div key={comment._id} className="border-t py-2">
-                    <p className="font-semibold">{comment.userId.name}</p>
-                    <p className="text-gray-400">{comment.text}</p>
-                  </div>
-              ))
-            ) : (
-              <p className="text-gray-500">No comments yet</p>
-            )}
-    </div>
+        <div className="comments mt-4 border-t border-[#5A00EE] pt-4">
+          <div className="max-h-40 overflow-y-auto">
+  {comments && comments.length > 0 ? (
+    comments.map((comment) => (
+      <div key={comment._id} className="border-t py-2 flex items-start">
+        <div className="mr-2">
+          {comment.userId.image ? (
+            <img
+              src={`${HOST}/${comment.userId.image}`}
+              alt="Commenter"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className={`uppercase h-8 w-8 text-lg flex items-center justify-center rounded-full ${getColor(
+                comment.userId.color
+              )}`}
+            >
+              {comment.userId.name.charAt(0)}
+            </div>
+          )}
+        </div>
+        <div className="flex-grow">
+          <div className="flex  items-center">
+            <p className="font-semibold mr-2">{comment.userId.name}</p>
+            <p className="text-gray-500 text-sm">
+              - {dateStr} ago
+            </p>
+          </div>
+          <p className="text-gray-400">{comment.text}</p>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-gray-500">No comments yet</p>
+  )}
+</div>
 
-    <div className="flex items-center mt-2">
-      <textarea
-        value={replyText}
-        onChange={(e) => setReplyText(e.target.value)}
-        className="flex-1 border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5A00EE] focus:border-[#5A00EE] transition-all bg-white text-gray-900"
-        placeholder="Comment!"
-      />
-      <button onClick={handleAddComment} className="ml-2 text-primary">
-        <IoMdSend className="text-2xl text-neutral-500 duration-300 transition-all hover:text-white hover:bg-[#5A00EE] p-1 rounded-full" />
-      </button>
-    </div>
-  </div>
-)}
+
+          <div className="mt-2 flex">
+            <input
+              type="text"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              className="border border-gray-300 text-gray-600 rounded-md p-2 flex-grow mr-2"
+              placeholder="Add a comment..."
+            />
+            <button
+              onClick={handleAddComment}
+              className="ml-2"
+            >
+              <IoMdSend className="text-2xl text-neutral-500 duration-300 transition-all hover:text-white hover:bg-[#5A00EE] p-1 rounded-full" />
+            </button>
+          </div>
+        </div>
+      )}
       {showProfile && <ProfileModal userData={userData} onClose={() => setShowProfile(false)} />}
     </div>
-  )
-  }
+  );
+};
+
 export default Post;

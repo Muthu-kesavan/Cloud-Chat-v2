@@ -256,7 +256,7 @@ export const getSavedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const userId = req.userId; 
-    const userPosts = await Post.find({ userId });
+    const userPosts = await Post.find({ userId }).sort({ createdAt: -1 });
     if (!userPosts || userPosts.length === 0) {
       return res.status(404).json({ message: "You have not posted anything yet." });
     }
