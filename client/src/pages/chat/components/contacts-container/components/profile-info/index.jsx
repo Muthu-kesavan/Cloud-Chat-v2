@@ -10,7 +10,7 @@ import { apiClient } from "@/lib/api-client";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"; 
 const ProfileInfo = () => {
-  const { userInfo, setUserInfo } = useAppStore();
+  const { userInfo, setUserInfo, clearUserData } = useAppStore();
   const navigate = useNavigate();
   const [isDialogOpen, setDialogOpen] = useState(false); 
 
@@ -19,7 +19,8 @@ const ProfileInfo = () => {
       const res = await apiClient.post(LOGOUT, {}, { withCredentials: true });
       if (res.status === 200) {
         navigate('/auth');
-        setUserInfo(null);
+        clearUserData();
+        setUserInfo(null)
       }
     } catch (err) {
       console.log(err);

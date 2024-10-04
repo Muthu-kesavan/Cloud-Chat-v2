@@ -1,15 +1,17 @@
 import { useAppStore } from '@/store';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoMdSend } from "react-icons/io";
 import { SlPicture } from "react-icons/sl";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import UserContent from '../userContent';
+import { IoMdCloseCircle } from "react-icons/io";
 
 const MainPost = () => {
   const { userInfo, createPost } = useAppStore();
   const [postText, setPostText] = useState("");
   const [media, setMedia] = useState(null); 
   const [mediaInfo, setMediaInfo] = useState("");
+  
 
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
@@ -17,6 +19,12 @@ const MainPost = () => {
       setMedia(file);
       setMediaInfo("Media received. Ready to post.");
     }
+  };
+
+  const handleRemoveMedia = () => {
+    setMedia(null);
+    setMediaInfo("");
+    document.getElementById('mediaInput').value = "";
   };
 
   const handleIconClick = () => {
@@ -34,6 +42,7 @@ const MainPost = () => {
       setMedia(null); 
       setMediaInfo(""); 
       window.location.reload(false);
+      toast.success("Posted Successfully");
     } catch (err) {
       console.error("Error creating post:", err);
     }
@@ -50,13 +59,12 @@ const MainPost = () => {
       <div className='border-b-1 pb-4'>
         <textarea
           placeholder={`Post your thoughts ${userInfo.name}`}
-          maxLength={120}
+          maxLength={300}
           className='bg-[#2b2c37] text-white rounded-lg w-full p-2 focus:outline-none focus:ring-2 focus:ring-[#5A00EE] focus:border-transparent border-2 border-[#5A00EE]'
           value={postText}
           onChange={(e) => setPostText(e.target.value)}
           onKeyPress={handleKeyPress} 
         ></textarea>
-
         <input
           type="file"
           id="mediaInput"
@@ -96,9 +104,31 @@ const MainPost = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        {mediaInfo && <p>{mediaInfo}</p>}
+
+        {media && (
+          <div className='relative flex justify-center mt-4'>
+            <button onClick={handleRemoveMedia} className="absolute top-1 right-2 text-red-600 text-3xl">
+              <IoMdCloseCircle />
+            </button>
+            {media.type.startsWith('image/') ? (
+              <img
+                src={URL.createObjectURL(media)}
+                alt="preview"
+                className='max-w-xs max-h-64 object-contain'
+              />
+            ) : (
+              <video
+                src={URL.createObjectURL(media)}
+                controls
+                className='max-w-xs max-h-48'
+              />
+            )}
+          </div>
+        )}
+
+        {mediaInfo && <p className='text-center text-gray-400'>{mediaInfo}</p>}
       </div>
-      <hr className='my-4 border-slate-800' />
+      <hr className='my-4 border-slate-300' />
       <UserContent />
     </div>
   );

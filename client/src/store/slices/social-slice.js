@@ -29,7 +29,8 @@ export const createSocialSlice = (set, get) => ({
       const response = await apiClient.get(GET_FEED, { withCredentials: true });
       set({ posts: response.data.feeds, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.log(error);
+      set({loading: false });
     }
   },
 
@@ -42,7 +43,8 @@ export const createSocialSlice = (set, get) => ({
         loading: false,
       }));
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.log(error);
+      set({ loading: false });
     }
   },
 
@@ -52,10 +54,12 @@ export const createSocialSlice = (set, get) => ({
       await apiClient.delete(DELETE_POST(postId), {withCredentials: true});
       set((state) => ({
         posts: state.posts.filter((post) => post._id !== postId),
+        userPosts: state.userPosts.filter((post)=> post._id !==postId),
         loading: false,
       }));
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.log(error);
+      set({loading: false });
     }
   },
 
@@ -70,8 +74,12 @@ export const createSocialSlice = (set, get) => ({
         posts: state.posts.map((post) =>
           post._id === postId ? { ...post, likes: updatedPost.likes } : post
         ),
+        userPosts: state.userPosts.map((post) =>
+          post._id === postId ? { ...post, likes: updatedPost.likes } : post
+        ),
       }));
     } catch (error) {
+      console.log(error);
       set({ error: error.message }); 
     }
   },
@@ -92,7 +100,8 @@ export const createSocialSlice = (set, get) => ({
         replyText: '',
       }));
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.log(error);
+      set({loading: false });
     }
   },
 
@@ -106,7 +115,8 @@ export const createSocialSlice = (set, get) => ({
         loading: false,
       });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.log(error);
+      set({loading: false });
     }
   },
 
@@ -121,7 +131,7 @@ export const createSocialSlice = (set, get) => ({
         });
     } catch(err){
       console.error("Error fetching comment count:", err);
-      set({ error: err.message, loading: false });
+      set({loading: false });
     }
 },
   postSaveorUnsave: async (postId) => {
@@ -136,9 +146,13 @@ export const createSocialSlice = (set, get) => ({
           posts: state.posts.map((post) =>
             post._id === postId ? { ...post, saved: updatedPost.saved } : post
           ),
+          userPosts: state.userPosts.map((post) =>
+            post._id === postId ? { ...post, saved: updatedPost.saved } : post
+          ),
         }));
       }
     } catch (error) {
+      console.log(error);
       set({ error: error.message }); 
     }
   },
@@ -149,7 +163,15 @@ export const createSocialSlice = (set, get) => ({
       set({userPosts: res.data?.posts, loading: false})
     }catch(err){
       console.error({err});
-      set({error: err.message, loading: false});
+      set({loading: false});
     }
-  }
+  },
+
+  clearUserData: () => set({
+    userPosts: [],
+    posts: [],
+    savedPosts: [],
+    comments: [],
+    commentCount: 0,
+  }),
 });

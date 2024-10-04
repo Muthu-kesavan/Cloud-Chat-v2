@@ -46,6 +46,10 @@ replies: [
       color: {
         type: Number,
       },
+      createdAt: {
+        type: Date,
+        default: Date.now, 
+      },
   },
 ],
 },

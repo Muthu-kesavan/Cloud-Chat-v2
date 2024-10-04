@@ -1,14 +1,9 @@
 import { useAppStore } from '@/store';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Post from '@/pages/explore/components/post';
 
 const UserContent = () => {
-  const { userInfo, getUserPost, userPosts, loading, error } = useAppStore();
-
-  
-  useEffect(() => {
-    getUserPost();
-  }, [getUserPost]);
+  const { userPosts, loading } = useAppStore();
 
   return (
     <div>
@@ -16,9 +11,9 @@ const UserContent = () => {
         {loading ? ( 
           <p>loading...</p>
         ) : userPosts.length > 0 ? (
-          userPosts.map((post) => (
-            <div key={post._id} className='p-2'>
-              <Post post={post} /> 
+          userPosts.map((userPost) => (
+            <div key={userPost._id} className='p-2'>
+              <Post post={userPost} /> 
             </div>
           ))
         ) : (

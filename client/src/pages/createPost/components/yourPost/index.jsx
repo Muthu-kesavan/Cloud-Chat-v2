@@ -1,28 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { useAppStore } from "@/store"; 
 import { FaRegComment } from "react-icons/fa";
-import { MdFavorite, MdFavoriteBorder, MdDelete} from "react-icons/md";
+import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import formatDistance from "date-fns/formatDistance";
 import { IoBookmark, IoBookmarkOutline } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
 import { GET_POST_COMMENTS, GET_USER, HOST, REPLY_TO_POST } from "@/utils/constants";
 import { apiClient } from "@/lib/api-client";
 import { getColor } from "@/lib/utils";
-import { toast } from "sonner"
-import Linkify from "react-linkify";
 import ProfileModal from "@/components/ui/ProfileModal";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const Post = ({post}) => {
+const YourPost = ({ post}) => {
   const {
     userInfo,
     likePost,
     postSaveorUnsave,
-    deletePost
   } = useAppStore(); 
 
-  const location = useLocation();
   const [userData, setUserData] = useState(null);
   const [enlargePicture, setEnlargePicture] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -31,7 +25,6 @@ const Post = ({post}) => {
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
-  const [isDialogOpen, setDialogOpen] = useState(false);
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
 
 
@@ -103,26 +96,12 @@ const Post = ({post}) => {
     }
   };
 
-  const handleDeletePost = async () => {
-    try {
-      await deletePost(post._id); 
-      toast.success("Post Deleted SuccessFully");
-
-    } catch (err) {
-      console.error("Error deleting post:", err);
-    }
-  };
-
   const handlePictureClick = () => {
     setEnlargePicture(!enlargePicture);
   };
 
   const handleProfileClick = () => {
     setShowProfile(!showProfile);
-  };
-
-  const handleDeleteClick = () => {
-    setDialogOpen(true); 
   };
 
   const handleToggleComments = () => {
@@ -154,9 +133,9 @@ const Post = ({post}) => {
           <p className="text-gray-500 ml-2">- {dateStr} ago</p>
         </div>
       )}
-      <Linkify>
+  
       <p className="font-semibold text-md mb-3">{post.description}</p>
-      </Linkify>
+  
       <div className="flex flex-col items-center">
         {post.video ? (
           <video
@@ -214,14 +193,6 @@ const Post = ({post}) => {
           )}
           <span>{post.saved?.includes(userInfo?.id) ? "Saved" : "Save"}</span>
         </button>
-        {location.pathname === "/lets-post" && (
-          <div className="relative group">
-            <button onClick={handleDeleteClick} className="flex items-center space-x-2">
-              <MdDelete className="text-red-600 transition duration-200" />
-              <span className="hidden group-hover:inline-block text-xs bg-gray-700 text-white rounded p-1 absolute -top-6 -left-4">Delete</span>
-            </button>
-          </div>
-        )}
       </div>
   
       {showComments && (
@@ -283,23 +254,8 @@ const Post = ({post}) => {
         </div>
       )}
       {showProfile && <ProfileModal userData={userData} onClose={() => setShowProfile(false)} />}
-      <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-[#5201fe] rounded-lg border-none text-white max-w-md w-full p-6 flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-center text-lg font-bold">Are you sure you want to delete this post?</DialogTitle>
-          </DialogHeader>
-          <div className="flex justify-center mt-4 gap-3">
-            <button onClick={() => setDialogOpen(false)} className="flex items-center bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">
-              No
-            </button>
-            <button onClick={handleDeletePost} className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
-              Yes
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
 
-export default Post;
+export default YourPost;
