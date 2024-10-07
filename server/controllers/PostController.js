@@ -1,8 +1,7 @@
 import { renameSync, unlinkSync } from 'fs';
 import Post from "../models/PostModel.js";
 import User from '../models/UserModel.js';
-
-
+import Message from '../models/MessagesModel.js';
 export const createPost = async (req, res) => {
   try {
     const { description } = req.body;

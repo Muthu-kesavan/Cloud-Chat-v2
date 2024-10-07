@@ -16,7 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import Linkify from "react-linkify";
 import ProfileModal from "@/components/ui/ProfileModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
+import ShareModal from "@/components/ui/ShareModal";
 const Post = ({post}) => {
   const {
     userInfo,
@@ -36,6 +36,7 @@ const Post = ({post}) => {
   const [commentCount, setCommentCount] = useState(0);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isHovered, setHovered] = useState(false);
+  const [isShareModalOpen, setShareModalOpen] = useState(false);
 
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
 
@@ -133,6 +134,11 @@ const Post = ({post}) => {
     setShowComments(!showComments);
   };
 
+  const handleShareClick = () => {
+    setShareModalOpen(true);
+  };
+
+
   return (
     <div className="p-4 border border-gray-200 rounded-md shadow-lg mb-6 transition-shadow hover:shadow-xl">
       {userData && (
@@ -229,7 +235,7 @@ const Post = ({post}) => {
     <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button onClick={()=>{}} className="flex items-center space-x-2">
+              <button onClick={handleShareClick} className="flex items-center space-x-2">
                 <RiSendPlaneLine className=" text-2xl hover:scale-125 transition-transform duration-200" />
               </button>
             </TooltipTrigger>
@@ -358,6 +364,7 @@ const Post = ({post}) => {
           </div>
         </DialogContent>
       </Dialog>
+      <ShareModal post={post} isOpen={isShareModalOpen} onClose={() => setShareModalOpen(false)} />
     </div>
   );
 };
