@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAppStore } from "@/store"; 
 import { FaRegComment } from "react-icons/fa";
+import { BsSend } from "react-icons/bs";
 import { MdFavorite, MdFavoriteBorder, MdDelete} from "react-icons/md";
+import { RiSendPlaneLine } from "react-icons/ri";
 import formatDistance from "date-fns/formatDistance";
 import { IoBookmark, IoBookmarkOutline } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
@@ -10,6 +12,7 @@ import { GET_POST_COMMENTS, GET_USER, HOST, REPLY_TO_POST } from "@/utils/consta
 import { apiClient } from "@/lib/api-client";
 import { getColor } from "@/lib/utils";
 import { toast } from "sonner"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Linkify from "react-linkify";
 import ProfileModal from "@/components/ui/ProfileModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -32,6 +35,8 @@ const Post = ({post}) => {
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isHovered, setHovered] = useState(false);
+
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
 
 
@@ -80,7 +85,6 @@ const Post = ({post}) => {
     catch(err){
       console.error(err);
     };
-    
   };
 
   const handleSavePost = async () => {
@@ -163,7 +167,8 @@ const Post = ({post}) => {
             controls
             controlsList="nodownload"
             src={`${HOST}/${post.video}`}
-            className="rounded-lg max-h-screen cursor-pointer transition-all duration-300"
+            className="rounded-lg max-h-96 max-w-full cursor-pointer transition-all duration-300"
+
           />
         ) : post.picture ? (
           <>
@@ -190,43 +195,98 @@ const Post = ({post}) => {
       </div>
   
       <div className="flex items-center space-x-6 mt-4 text-lg md:text-xl">
-        <button onClick={handleLike} className="flex items-center space-x-2">
-          {post.likes?.includes(userInfo?.id) ? (
-            <MdFavorite className="text-red-500 hover:scale-125 transition-transform duration-200" />
-          ) : (
-            <MdFavoriteBorder className="hover:scale-125 transition-transform duration-200" />
-          )}
-          <span>{post.likes?.length || 0}</span>
-        </button>
-  
+        {/* Like Button */}
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+      <button onClick={handleLike} className="flex items-center space-x-2 relative">
+  {post.likes?.includes(userInfo?.id) ? (
+    <>
+      <MdFavorite className="text-[#5A00EE] hover:scale-125 transition-transform duration-200" />
+    </>
+  ) : (
+    <MdFavoriteBorder className="hover:scale-125 transition-transform duration-200" />
+  )}
+  <span>{post.likes?.length || 0}</span>
+</button>
+      </TooltipTrigger>
+      <TooltipContent className="border-none">
+        <p>Like</p>
+      </TooltipContent>
+    </Tooltip>
+    
+    <Tooltip>
+      <TooltipTrigger asChild>
         <button onClick={handleToggleComments} className="flex items-center space-x-2">
           <FaRegComment className="hover:scale-125 transition-transform duration-200" />
           <span>{commentCount}</span>
         </button>
+      </TooltipTrigger>
+      <TooltipContent className="border-none">
+        <p>Comment</p>
+      </TooltipContent>
+    </Tooltip>
+    <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button onClick={()=>{}} className="flex items-center space-x-2">
+                <RiSendPlaneLine className=" text-2xl hover:scale-125 transition-transform duration-200" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="border-none">
+              <p>Share</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+    
+    <Tooltip>
+      <TooltipTrigger asChild>
+      <button onClick={handleSavePost} className="flex items-center space-x-2">
+  {post.saved?.includes(userInfo?.id) ? (
+    <>
+      <IoBookmark className="hover:scale-125 transition-transform duration-200" />
+    </>
+  ) : (
+    <IoBookmarkOutline className="hover:scale-125 transition-transform duration-200" />
+  )}
+  {isSaving ? null : null}
+</button>
+
+      </TooltipTrigger>
+      <TooltipContent className="border-none">
+        <p>Save</p>
+      </TooltipContent>
+    </Tooltip>
+    
   
-        <button onClick={handleSavePost} className="flex items-center space-x-2">
-          {isSaving ? (
-            <span>Saving...</span>
-          ) : post.saved?.includes(userInfo?.id) ? (
-            <IoBookmark className="hover:scale-125 transition-transform duration-200" />
-          ) : (
-            <IoBookmarkOutline className="hover:scale-125 transition-transform duration-200" />
-          )}
-          <span>{post.saved?.includes(userInfo?.id) ? "Saved" : "Save"}</span>
-        </button>
-        {location.pathname === "/lets-post" && (
-          <div className="relative group">
-            <button onClick={handleDeleteClick} className="flex items-center space-x-2">
-              <MdDelete className="text-red-600 transition duration-200" />
-              <span className="hidden group-hover:inline-block text-xs bg-gray-700 text-white rounded p-1 absolute -top-6 -left-4">Delete</span>
-            </button>
-          </div>
-        )}
-      </div>
+    {location.pathname === "/lets-post" && (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={handleDeleteClick}
+            className="flex items-center space-x-2 relative"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+          >
+            <MdDelete
+              className={`transition duration-200 ${
+                isHovered ? 'text-red-600 scale-125 transition-transform duration-200' : 'text-white'
+              }`}
+            />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent className="border-none">
+          <p>Delete</p>
+        </TooltipContent>
+      </Tooltip>
+    )}
+
+  </TooltipProvider>
+</div>
   
       {showComments && (
         <div className="comments mt-4 border-t border-[#5A00EE] pt-4">
-          <div className="max-h-40 overflow-y-auto">
+          <div className="max-h-60 overflow-y-auto">
   {comments && comments.length > 0 ? (
     comments.map((comment) => (
       <div key={comment._id} className="border-t py-2 flex items-start">
@@ -284,15 +344,15 @@ const Post = ({post}) => {
       )}
       {showProfile && <ProfileModal userData={userData} onClose={() => setShowProfile(false)} />}
       <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-[#5201fe] rounded-lg border-none text-white max-w-md w-full p-6 flex flex-col">
+        <DialogContent className="bg-[#1c1d25] rounded-lg border-none text-white max-w-md w-full p-6 flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-center text-lg font-bold">Are you sure you want to delete this post?</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center mt-4 gap-3">
-            <button onClick={() => setDialogOpen(false)} className="flex items-center bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">
+            <button onClick={() => setDialogOpen(false)} className="flex items-center  bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">
               No
             </button>
-            <button onClick={handleDeletePost} className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+            <button onClick={handleDeletePost} className="bg-red-500 hover:bg-red-600 text-white py-2  px-4 rounded">
               Yes
             </button>
           </div>

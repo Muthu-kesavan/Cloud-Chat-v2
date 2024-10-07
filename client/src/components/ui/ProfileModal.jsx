@@ -12,7 +12,7 @@ const ProfileModal = ({ userData, onClose }) => {
         <div className="flex items-center justify-center">
           {userData.image ? (
             <img
-              src={`${HOST}/${userData.image}`} // Ensure this URL is correct
+              src={`${HOST}/${userData.image}`} 
               alt="Profile Pic"
               className="w-64 h-64 rounded-full bg-transparent"
             />

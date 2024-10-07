@@ -102,10 +102,9 @@ const ProfileInfo = () => {
 
       
       <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-  <DialogContent className="bg-[#5201fe] rounded-lg border-none text-white max-w-md w-full p-6 flex flex-col">
+  <DialogContent className="bg-[#1c1d25] rounded-lg border-none text-white max-w-md w-full p-6 flex flex-col">
     <DialogHeader>
       <DialogTitle className="text-center text-lg font-bold">Are you sure you want to log out?</DialogTitle>
-      {/*<DialogDescription className="text-center text-xl text color white">Are you sure you want to log out?</DialogDescription>*/}
     </DialogHeader>
     <div className="flex justify-center mt-4 gap-3">
       <button onClick={() => setDialogOpen(false)} className="flex items-center bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">
