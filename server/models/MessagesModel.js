@@ -13,7 +13,7 @@ const messageSchema = new mongoose.Schema({
   },
   messageType: {
     type: String,
-    enum: ["text", "file", "location"],
+    enum: ["text", "file", "location", "post"],  // Add "post" to the enum
     required: true,
   },
   content: {
@@ -41,6 +41,16 @@ const messageSchema = new mongoose.Schema({
         return this.messageType === "location";
       },
     },
+  },
+  post: {
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",  // Reference the Post model
+    },
+    description: String,  // Post description
+    link: String,  // URL of the shared post
+    imageUrl: String,  // URL if the post contains an image
+    videoUrl: String,  // URL if the post contains a video
   },
   timestamp: {
     type: Date,

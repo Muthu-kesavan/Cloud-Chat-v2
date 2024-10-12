@@ -17,6 +17,8 @@ import Linkify from "react-linkify";
 import ProfileModal from "@/components/ui/ProfileModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ShareModal from "@/components/ui/ShareModal";
+import PostModal from "@/components/ui/PostModal";
+
 const Post = ({post}) => {
   const {
     userInfo,
@@ -37,6 +39,7 @@ const Post = ({post}) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isHovered, setHovered] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
 
@@ -160,12 +163,12 @@ const Post = ({post}) => {
               </div>
             )}
           </div>
-          <span className="ml-3 font-semibold text-lg">{userData.name}</span>
+          <span className="ml-3 font-semibold text-lg text-white">{userData.name}</span>
           <p className="text-gray-500 ml-2">- {dateStr} ago</p>
         </div>
       )}
       <Linkify>
-      <p className="font-semibold text-md mb-3">{post.description}</p>
+      <p className="text-md mb-3 text-[#EAEAEA]">{post.description}</p>
       </Linkify>
       <div className="flex flex-col items-center">
         {post.video ? (
@@ -200,7 +203,7 @@ const Post = ({post}) => {
         ) : null}
       </div>
   
-      <div className="flex items-center space-x-6 mt-4 text-lg md:text-xl">
+      <div className="flex  justify-around items-center space-x-4 mt-4 text-lg md:text-xl">
         {/* Like Button */}
   <TooltipProvider>
     <Tooltip>
@@ -365,6 +368,7 @@ const Post = ({post}) => {
         </DialogContent>
       </Dialog>
       <ShareModal post={post} isOpen={isShareModalOpen} onClose={() => setShareModalOpen(false)} />
+      <PostModal post={post} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

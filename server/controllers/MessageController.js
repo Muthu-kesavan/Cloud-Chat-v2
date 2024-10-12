@@ -51,7 +51,7 @@ export const uploadFile = async(req, res)=> {
 export const deleteMessage = async (req, res) => {
   try {
     const {messageId} = req.params;
-    const userId = req.userId;  // Assuming you have the user ID from token
+    const userId = req.userId;  
 
     // Find the message
     const message = await Message.findById(messageId);

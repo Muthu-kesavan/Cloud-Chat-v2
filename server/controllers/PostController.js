@@ -1,7 +1,11 @@
 import { renameSync, unlinkSync } from 'fs';
+import jwt from "jsonwebtoken";
 import Post from "../models/PostModel.js";
 import User from '../models/UserModel.js';
 import Message from '../models/MessagesModel.js';
+import Channel from '../models/ChannelModel.js';
+import dotenv from "dotenv";
+dotenv.config();
 export const createPost = async (req, res) => {
   try {
     const { description } = req.body;
@@ -172,20 +176,72 @@ export const getFeed = async (req, res) => {
 
 export const sharePost = async (req, res) => {
   try {
-    const {postId} = req.params; 
-    const post = await Post.findById(postId);
+    const { postId } = req.params;
+    const { recipientIds } = req.body; 
+    const senderId = req.userId; 
 
+    if (!Array.isArray(recipientIds) || recipientIds.length === 0) {
+      return res.status(400).json({ error: "recipientIds must be a non-empty array." });
+    }
+
+    const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
-    const shareableLink = `http://localhost:8747/posts/${postId}`;
-    const message = `Check out this post: ${post.description} \n${shareableLink}`;
-    res.status(200).json({ message: "Post can be shared", link: shareableLink, postDescription: post.description });
+
+    const shareableLink = `http://127.0.0.1:5173/post/${postId}`;
+
+    const sharedMessages = await Promise.all(recipientIds.map(async (recipientId) => {
+      const group = await Channel.findById(recipientId);
+
+      if (group) {
+        const sharedMessage = new Message({
+          sender: senderId,
+          messageType: 'post',
+          post: {
+            postId: post._id,
+            description: post.description,
+            link: shareableLink,
+            imageUrl: post.picture || null,  // Use post.picture here
+            videoUrl: post.video || null,    // Use post.video here
+          },
+        });
+        const savedMessage = await sharedMessage.save();
+        group.messages.push(savedMessage._id);
+        await group.save(); 
+
+        return savedMessage; 
+      } else {
+        const sharedMessage = new Message({
+          sender: senderId,
+          recipient: recipientId,
+          messageType: 'post',
+          post: {
+            postId: post._id,
+            description: post.description,
+            link: shareableLink,
+            imageUrl: post.picture || null,  // Use post.picture here
+            videoUrl: post.video || null,    // Use post.video here
+          },
+        });
+        return await sharedMessage.save(); 
+      }
+    }));
+    
+    res.status(200).json({
+      message: `Post shared successfully with the recipients`,
+      link: shareableLink,
+      postDescription: post.description,
+      imageUrl: post.picture || null,  // Return post.picture instead of post.imageUrl
+      videoUrl: post.video || null,    // Return post.video instead of post.videoUrl
+      sharedMessages  
+    });
   } catch (err) {
-    console.error(err); 
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const saveOrUnsavePost = async (req, res) => {
   try {
@@ -222,8 +278,6 @@ export const saveOrUnsavePost = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-
 
 
 export const getSavedPosts = async (req, res) => {
@@ -265,6 +319,7 @@ export const getUserPosts = async (req, res) => {
   }
 };
 
+
 export const PostSaveorUnsave = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -295,3 +350,31 @@ export const PostSaveorUnsave = async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 };
+
+
+export const getSinglePost = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const post = await Post.findById(postId).populate('userId', 'name image color'); // Populate user data
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const userData = post.userId;
+
+    const features = {
+      canLike: !!req.user,
+      canComment: !!req.user,
+      canShare: !!req.user,
+      canSave: !!req.user
+    };
+
+    res.status(200).json({
+      post,
+      userData, // Send populated user data
+      features
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+};
+

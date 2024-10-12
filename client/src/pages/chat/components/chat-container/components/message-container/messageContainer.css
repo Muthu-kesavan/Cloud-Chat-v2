@@ -55,5 +55,15 @@
   opacity: 1;
 }
 
+.post-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.post-video {
+  max-width: 100%;
+  height: auto;
+}
+
 
 

@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppStore } from './store'
 import { apiClient } from './lib/api-client'
 import { GET_USER_INFO } from './utils/constants'
+import SinglePost from './pages/nonUserPage'
 
 
 
@@ -61,6 +62,7 @@ const App = () => {
       <Route path='/profile' element={<PrivateRoute><Profile /></PrivateRoute>} />
       <Route path='/explore' element={<PrivateRoute><Explore /></PrivateRoute>} /> 
       <Route  path='/lets-post' element={<PrivateRoute><CreatePost /></PrivateRoute>}/>
+      <Route path='/post/:postId' element={<SinglePost />} />
       <Route path='*' element={<Navigate to="/auth" />}/>
     </Routes>
     </BrowserRouter>

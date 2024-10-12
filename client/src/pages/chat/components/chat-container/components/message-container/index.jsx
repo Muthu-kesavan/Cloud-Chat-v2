@@ -14,6 +14,7 @@ import { GrLocation } from "react-icons/gr";
 import Linkify from "react-linkify";
 import { Tooltip } from 'react-tooltip'
 import { useSocket } from "@/context/socketContext";
+import PostModal from "@/components/ui/PostModal";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -32,6 +33,7 @@ const MessageContainer = () => {
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isHovered, setHovered] = useState(false);
+
   useEffect(() => {
     const getMessages = async () => {
       try {
@@ -71,6 +73,10 @@ const MessageContainer = () => {
     const imageRegex = /\.(jpg|jpeg|png|gif|bmp|tiff|webp|svg|ico|heic|heif)$/i;
     return imageRegex.test(filePath);
   };
+  const checkVideo = (filePath)=> {
+    const videoRegex = /\.(mp4|mov|avi|mkv|webm|flv|wmv|m4v)$/i;
+    return videoRegex.test(filePath);
+    }
 
   const handleDeleteMessage = async (messageId) => {
     try {
@@ -173,25 +179,42 @@ const MessageContainer = () => {
             } message-bubble`}
           >
             {checkImage(message.fileUrl) ? (
-              <div className="cursor-pointer"
-                onClick={() => {
-                  setShowImage(true);
-                  setImageUrl(message.fileUrl);
-                }}
-              >
-                <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-4">
-                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
-                  <MdFolderZip />
-                </span>
-                <span>{message.fileUrl.split("/").pop()}</span>
-                <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
-                  <IoMdArrowDown />
-                </span>
-              </div>
-            )}
+  <div className="cursor-pointer"
+    onClick={() => {
+      setShowImage(true);
+      setImageUrl(message.fileUrl);
+    }}
+  >
+    <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
+  </div>
+) : checkVideo(message.fileUrl) ? (
+  <div className="cursor-pointer"
+    onClick={() => {
+      setShowVideo(true);
+      setVideoUrl(message.fileUrl);
+    }}
+  >
+    <video
+      src={`${HOST}/${message.fileUrl}`}
+      height={300}
+      width={300}
+      controls
+    >
+      Your browser does not support the video tag.
+    </video>
+  </div>
+) : (
+  <div className="flex items-center justify-center gap-4">
+    <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
+      <MdFolderZip />
+    </span>
+    <span>{message.fileUrl.split("/").pop()}</span>
+    <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
+      <IoMdArrowDown />
+    </span>
+  </div>
+)}
+
             {message.sender === userInfo.id && (
               <span
               className="delete-icon"
@@ -241,6 +264,71 @@ const MessageContainer = () => {
           <Tooltip id="deleteTooltip" place="top" content="Delete" />
           </div>
   )}
+  
+  {message.messageType === "post" && (
+  <div
+    className={`${
+      message.sender !== selectedChatData._id
+        ? "bg-senderBubble text-senderText border-senderBorder"
+        : "bg-receiverBubble text-receiverText border-receiverBorder"
+    } message-bubble`}
+  >
+    {/* Display Image */}
+    {message.post.imageUrl && checkImage(message.post.imageUrl) ? (
+      <div
+        className="cursor-pointer"
+        onClick={() => {
+          setShowImage(true);
+          setImageUrl(message.post.imageUrl);
+        }}
+      >
+        <img src={`${HOST}/${message.post.imageUrl}`} height={300} width={300} />
+      </div>
+    ) : null}
+
+    {/* Display Video */}
+    {message.post.videoUrl ? (
+      <video
+        controls
+        width="300"
+        height="300"
+        src={`${HOST}/${message.post.videoUrl}`}
+        alt="Post Video"
+      />
+    ) : null}
+
+    {/* If no image/video, display a description with a link */}
+    {!message.post.imageUrl && !message.post.videoUrl && (
+      <p>{message.post.description}</p>
+    )}
+
+    {/* Link to the original post */}
+    <a 
+      href={message.post.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-align center text-blue-500 underline"
+    >
+      View Post
+    </a>
+
+    {/* Delete option for the sender */}
+    {message.sender === userInfo.id && (
+      <span
+        className="delete-icon"
+        data-tooltip-id="deleteTooltip"
+        style={{ color: isHovered ? "red" : "white" }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={() => handleDeleteMessage(message._id)}
+      >
+        <MdDelete />
+      </span>
+    )}
+    <Tooltip id="deleteTooltip" place="top" content="Delete" />
+  </div>
+)}
+
         <div className="text-xs text-gray-600">
           {moment(message.timestamp).format("LT")}
         </div>
@@ -310,24 +398,37 @@ const MessageContainer = () => {
                 : "bg-receiverBubble text-receiverText border-receiverBorder"
             } message-bubble`}
           >
-            {checkImage(message.fileUrl) ? (
-              <div className="cursor-pointer" onClick={() => { setShowImage(true); setImageUrl(message.fileUrl); }}>
-                <img
-                  src={`${HOST}/${message.fileUrl}`}
-                  height={300}
-                  width={300}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'fallback-image-url'; }} // handle error
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-4">
-                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3"><MdFolderZip /></span>
-                <span>{message.fileUrl.split("/").pop()}</span>
-                <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
-                  <IoMdArrowDown />
-                </span>
-              </div>
-            )}
+           {checkImage(message.fileUrl) ? (
+  <div className="cursor-pointer" onClick={() => { setShowImage(true); setImageUrl(message.fileUrl); }}>
+    <img
+      src={`${HOST}/${message.fileUrl}`}
+      height={300}
+      width={300}
+      onError={(e) => { e.target.onerror = null; e.target.src = 'fallback-image-url'; }} 
+    />
+  </div>
+) : checkVideo(message.fileUrl) ? (
+  <div className="cursor-pointer" onClick={() => { setShowVideo(true); setVideoUrl(message.fileUrl); }}>
+    <video
+      src={`${HOST}/${message.fileUrl}`}
+      height={300}
+      width={300}
+      controls
+      onError={(e) => { e.target.onerror = null; e.target.src = 'fallback-video-url'; }} 
+    >
+      Your browser does not support the video tag.
+    </video>
+  </div>
+) : (
+  <div className="flex items-center justify-center gap-4">
+    <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3"><MdFolderZip /></span>
+    <span>{message.fileUrl.split("/").pop()}</span>
+    <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
+      <IoMdArrowDown />
+    </span>
+  </div>
+)}
+
             {isCurrentUser && (
               <span
               className="delete-icon" data-tooltip-id="deleteTooltip" style={{ color: isHovered ? 'red' : 'white' }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => handleDeleteMessage(message._id)}
@@ -365,6 +466,60 @@ const MessageContainer = () => {
           </div>
         )}
 
+{message.messageType === "post" && (
+  <div
+  className={`${
+    isCurrentUser
+      ? "bg-senderBubble text-senderText border-senderBorder"
+      : "bg-receiverBubble text-receiverText border-receiverBorder"
+  } message-bubble`}
+  >
+    {/* Display Image */}
+    {message.post.imageUrl && checkImage(message.post.imageUrl) ? (
+      <div
+        className="cursor-pointer"
+        onClick={() => {
+          setShowImage(true);
+          setImageUrl(message.post.imageUrl);
+        }}
+      >
+        <img src={`${HOST}/${message.post.imageUrl}`} height={300} width={300} />
+      </div>
+    ) : null}
+
+
+    {message.post.videoUrl ? (
+      <video
+        controls
+        width="300"
+        height="300"
+        src={`${HOST}/${message.post.videoUrl}`}
+        alt="Post Video"
+      />
+    ) : null}
+
+    {!message.post.imageUrl && !message.post.videoUrl && (
+      <p>{message.post.description}</p>
+    )}
+
+    <a 
+      href={message.post.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-align center text-blue-500 underline"
+    >
+      View Post
+    </a>
+    {isCurrentUser && (
+                <span
+                className="delete-icon" data-tooltip-id="deleteTooltip" style={{ color: isHovered ? 'red' : 'white' }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => handleDeleteMessage(message._id)}
+              >
+                <MdDelete />
+              </span>
+              )}
+    <Tooltip id="deleteTooltip" place="top" content="Delete" />
+  </div>
+)}
         <div className="text-xs text-gray-600">
           {moment(message.timestamp).format("LT")}
         </div>
@@ -402,6 +557,7 @@ const MessageContainer = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

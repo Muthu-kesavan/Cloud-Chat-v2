@@ -39,11 +39,10 @@ export const DELETE_POST = (postId) => `${POST_ROUTES}/${postId}`;
 export const LIKE_DISLIKE_POST = (postId) => `${POST_ROUTES}/${postId}/like`;
 export const REPLY_TO_POST = (postId) => `${POST_ROUTES}/${postId}/reply`;
 export const GET_POST_COMMENTS = (postId) => `${POST_ROUTES}/${postId}/comments`;
-
-// Feed and Saved Posts
 export const GET_FEED = `${POST_ROUTES}/feed`;
 export const GET_SAVED_POSTS = `${POST_ROUTES}/saved`;
 export const SHARE_POST = (postId) => `${POST_ROUTES}/${postId}/share`;
 export const POST_SAVE_OR_UNSAVE = (postId)=> `${POST_ROUTES}/${postId}/save`;
 export const SAVE_OR_UNSAVE_POST = (postId) => `${POST_ROUTES}/${postId}/save`;
 export const GET_USER_POSTS = `${POST_ROUTES}/myPosts`;
+export const SINGLE_POST =(postId)=> `${POST_ROUTES}/${postId}`;
