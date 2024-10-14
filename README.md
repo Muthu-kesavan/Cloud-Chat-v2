@@ -7,16 +7,24 @@
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)](https://www.mongodb.com/)
 
 
-> **CloudChat** is a feature-rich messaging platform that allows users to communicate in **one-on-one** and **group chats**, share images, files, and text messages, and securely sign up with **OTP verification**.
+> **Cloud-Chat** is a feature-rich social media platform that allows users to communicate in **one-on-one** and **group chats**, **share images, videos, files, location and text messages**, and securely sign up with **OTP verification**. Users can also engage with **posts** through likes, comments, and replies for better connectivity.
+
 
 ## ✨ Features
 
+- 🔐 **OTP Signup**: Secure the signup process with One-Time Password (OTP) for authentication.
 - 🔒 **One-on-One Chats**: Private conversations between users.
 - 👥 **Group Chats**: Create or join group chats to collaborate and share content.
 - 🖼️ **File & Media Sharing**: Share images, documents, and files seamlessly within chats.
-- 🔐 **OTP Signup**: Secure the signup process with One-Time Password (OTP) for authentication.
+- 📍 **Location Sharing**: Share your location within one-on-one and group chats for better context and connectivity.
+
 - 📅 **Real-Time Messaging**: Instant, real-time communication using WebSockets.
 - 💬 **Responsive UI**: Designed for an optimal device experience.
+- 📸 **Social Media Features**: 
+  - Share images, videos, and texts as post.
+  - Like, comment, and reply to posts for enhanced interaction.
+  - Save and share posts with existing users and others.
+
 
 ## 🚀 Tech Stack
 
@@ -143,6 +151,7 @@ CloudChat/
 - `POST /api/auth/upload-image`: Upload user profile image.
 - `POST /api/auth/remove-image`: Remove user profile image.
 - `POST /api/auth/logout`: Log out the user.
+- `GET /api/auth/find/userId` : Fetch the Single User Info. 
 
 ### Contact Routes
 - `GET /api/contacts/search`: Search for contacts.
@@ -157,6 +166,21 @@ CloudChat/
 - `POST /api/channel/create-channel`: Create a new channel.
 - `GET /api/channel/get-user-channels`: Fetch user channels.
 - `GET /api/channel/channel-messages`: Fetch messages from a specific channel.
+
+### Post Routes
+- `POST /api/post/post`: Create a new Post.
+- `GET /api/post/postId`: Fetch the Single Post. 
+- `DELETE /api/post/postId`: Delete a post.
+- `PATCH /api/post/postId/like`: Like a Post.
+- `PUT /api/post/postId/reply`: Reply to a post.
+-  `GET /api/post/postId/Comment`: Fetch the post Comments.
+-  `GET /api/post/feed`: Fetch all posts.
+-  `PATCH /api/post/postId/save`: Save the Post.
+-  `POST /api/post/postId/share`: Share the Post.
+-  `GET /api/post/saved`: Fetch saved Posts.
+- `GET /api/post/myPost`: Fetch User post.
+
+
 
 ## 📬 Contact
 Feel free to reach out if you have any questions or suggestions!
