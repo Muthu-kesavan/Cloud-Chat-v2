@@ -15,6 +15,7 @@ import {
 } from "@/utils/constants";
 
 export const createSocialSlice = (set, get) => ({
+  sharedPosts: [],
   userPosts: [],
   posts: [],
   comments: [],

@@ -114,6 +114,7 @@ const Post = ({post}) => {
   const handleDeletePost = async () => {
     try {
       await deletePost(post._id); 
+      console.log(post._id);
       toast.success("Post Deleted SuccessFully");
 
     } catch (err) {
@@ -130,6 +131,7 @@ const Post = ({post}) => {
   };
 
   const handleDeleteClick = () => {
+
     setDialogOpen(true); 
   };
 
@@ -175,6 +177,7 @@ const Post = ({post}) => {
           <video
             controls
             controlsList="nodownload"
+            alt="Post Video"
             src={`${HOST}/${post.video}`}
             className="rounded-lg max-h-96 max-w-full cursor-pointer transition-all duration-300"
 
@@ -204,7 +207,7 @@ const Post = ({post}) => {
       </div>
   
       <div className="flex  justify-around items-center space-x-4 mt-4 text-lg md:text-xl">
-        {/* Like Button */}
+        
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>

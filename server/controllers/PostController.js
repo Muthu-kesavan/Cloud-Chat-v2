@@ -1,10 +1,12 @@
 import { renameSync, unlinkSync } from 'fs';
 import jwt from "jsonwebtoken";
+import cookieParser from 'cookie-parser'
 import Post from "../models/PostModel.js";
 import User from '../models/UserModel.js';
 import Message from '../models/MessagesModel.js';
 import Channel from '../models/ChannelModel.js';
 import dotenv from "dotenv";
+
 dotenv.config();
 export const createPost = async (req, res) => {
   try {
@@ -354,27 +356,42 @@ export const PostSaveorUnsave = async (req, res) => {
 
 export const getSinglePost = async (req, res) => {
   const { postId } = req.params;
+  const token = req.cookies.jwt; 
+  console.log(token);
   try {
-    const post = await Post.findById(postId).populate('userId', 'name image color'); // Populate user data
+    const post = await Post.findById(postId).populate('userId', 'name image color'); 
+
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
+
     const userData = post.userId;
+    let isAuthenticated = false;
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT);
+        isAuthenticated = !!decoded; 
+      } catch (error) {
+        console.error('Token verification failed:', error);
+        isAuthenticated = false; 
+      }
+    }
 
     const features = {
-      canLike: !!req.user,
-      canComment: !!req.user,
-      canShare: !!req.user,
-      canSave: !!req.user
+      canLike: isAuthenticated,
+      canComment: isAuthenticated,
+      canShare: isAuthenticated,
+      canSave: isAuthenticated
     };
 
     res.status(200).json({
       post,
-      userData, // Send populated user data
+      userData,
       features
     });
+
   } catch (error) {
     res.status(500).json({ message: 'Error fetching post' });
   }
 };
-

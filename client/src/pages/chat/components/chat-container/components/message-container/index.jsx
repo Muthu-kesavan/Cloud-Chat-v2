@@ -158,19 +158,21 @@ const MessageContainer = () => {
             <Linkify>{message.content}</Linkify>
             {message.sender === userInfo.id && (
               <span
-              className="delete-icon"
-              data-tooltip-id="deleteTooltip" 
-              style={{ color: isHovered ? 'red' : 'white' }} 
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-              onClick={() => handleDeleteMessage(message._id)}
-            >
-              <MdDelete />
-            </span>)}
+                className="delete-icon"
+                data-tooltip-id="deleteTooltip"
+                style={{ color: isHovered ? "red" : "white" }}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                onClick={() => handleDeleteMessage(message._id)}
+              >
+                <MdDelete />
+              </span>
+            )}
             <Tooltip id="deleteTooltip" place="top" content="Delete" />
           </div>
         )}
-            {message.messageType === "file" && (
+  
+        {message.messageType === "file" && (
           <div
             className={`${
               message.sender !== selectedChatData._id
@@ -179,53 +181,67 @@ const MessageContainer = () => {
             } message-bubble`}
           >
             {checkImage(message.fileUrl) ? (
-  <div className="cursor-pointer"
-    onClick={() => {
-      setShowImage(true);
-      setImageUrl(message.fileUrl);
-    }}
-  >
-    <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
-  </div>
-) : checkVideo(message.fileUrl) ? (
-  <div className="cursor-pointer"
-    onClick={() => {
-      setShowVideo(true);
-      setVideoUrl(message.fileUrl);
-    }}
-  >
-    <video
-      src={`${HOST}/${message.fileUrl}`}
-      height={300}
-      width={300}
-      controls
-    >
-      Your browser does not support the video tag.
-    </video>
-  </div>
-) : (
-  <div className="flex items-center justify-center gap-4">
-    <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
-      <MdFolderZip />
-    </span>
-    <span>{message.fileUrl.split("/").pop()}</span>
-    <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all" onClick={() => downloadFile(message.fileUrl)}>
-      <IoMdArrowDown />
-    </span>
-  </div>
-)}
-
+              <div className="cursor-pointer"
+                onClick={() => {
+                  setShowImage(true);
+                  setImageUrl(message.fileUrl);
+                }}
+              >
+                <img 
+                  src={`${HOST}/${message.fileUrl}`} 
+                  height={300} 
+                  width={300} 
+                  alt="File Image"
+                  onError={(e) =>  { 
+                    e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Image Not Found</p>"; 
+                  }}
+                />
+              </div>
+            ) : checkVideo(message.fileUrl) ? (
+              <div className="cursor-pointer"
+                onClick={() => {
+                  setShowVideo(true);
+                  setVideoUrl(message.fileUrl);
+                }}
+              >
+                <video
+                  src={`${HOST}/${message.fileUrl}`}
+                  height={300}
+                  width={300}
+                  controls
+                  onError={(e) =>  { 
+                    e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Video Not Found</p>"; 
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
+                  <MdFolderZip />
+                </span>
+                <span>{message.fileUrl.split("/").pop()}</span>
+                <span
+                  className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all"
+                  onClick={() => downloadFile(message.fileUrl)}
+                >
+                  <IoMdArrowDown />
+                </span>
+              </div>
+            )}
+  
             {message.sender === userInfo.id && (
               <span
-              className="delete-icon"
-              data-tooltip-id="deleteTooltip" 
-              style={{ color: isHovered ? 'red' : 'white' }} 
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-              onClick={() => handleDeleteMessage(message._id)}
-            >
-              <MdDelete />
-            </span>
+                className="delete-icon"
+                data-tooltip-id="deleteTooltip"
+                style={{ color: isHovered ? "red" : "white" }}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                onClick={() => handleDeleteMessage(message._id)}
+              >
+                <MdDelete />
+              </span>
             )}
             <Tooltip id="deleteTooltip" place="top" content="Delete" />
           </div>
@@ -239,102 +255,115 @@ const MessageContainer = () => {
                 : "bg-receiverBubble text-receiverText border-receiverBorder"
             } message-bubble`}
           >
-            
-          <span><GrLocation className="text-xl"/>
-          <a
-            href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-500 underline ml-2"
-          > Location
-          </a>
-          </span>
-          {message.sender === userInfo.id && (
-             <span
-             className="delete-icon"
-             data-tooltip-id="deleteTooltip" 
-             style={{ color: isHovered ? 'red' : 'white' }} 
-             onMouseEnter={() => setHovered(true)}
-             onMouseLeave={() => setHovered(false)}
-             onClick={() => handleDeleteMessage(message._id)}
-           >
-             <MdDelete />
-           </span>
-          )}
-          <Tooltip id="deleteTooltip" place="top" content="Delete" />
+            <span>
+              <GrLocation className="text-xl" />
+              <a
+                href={`https://www.google.com/maps?q=${message.location.lat},${message.location.long}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-blue-500 underline ml-2"
+              >
+                Location
+              </a>
+            </span>
+            {message.sender === userInfo.id && (
+              <span
+                className="delete-icon"
+                data-tooltip-id="deleteTooltip"
+                style={{ color: isHovered ? "red" : "white" }}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                onClick={() => handleDeleteMessage(message._id)}
+              >
+                <MdDelete />
+              </span>
+            )}
+            <Tooltip id="deleteTooltip" place="top" content="Delete" />
           </div>
-  )}
+        )}
   
-  {message.messageType === "post" && (
-  <div
-    className={`${
-      message.sender !== selectedChatData._id
-        ? "bg-senderBubble text-senderText border-senderBorder"
-        : "bg-receiverBubble text-receiverText border-receiverBorder"
-    } message-bubble`}
-  >
-    {/* Display Image */}
-    {message.post.imageUrl && checkImage(message.post.imageUrl) ? (
-      <div
-        className="cursor-pointer"
-        onClick={() => {
-          setShowImage(true);
-          setImageUrl(message.post.imageUrl);
-        }}
-      >
-        <img src={`${HOST}/${message.post.imageUrl}`} height={300} width={300} />
-      </div>
-    ) : null}
-
-    {/* Display Video */}
-    {message.post.videoUrl ? (
-      <video
-        controls
-        width="300"
-        height="300"
-        src={`${HOST}/${message.post.videoUrl}`}
-        alt="Post Video"
-      />
-    ) : null}
-
-    {/* If no image/video, display a description with a link */}
-    {!message.post.imageUrl && !message.post.videoUrl && (
-      <p>{message.post.description}</p>
-    )}
-
-    {/* Link to the original post */}
-    <a 
-      href={message.post.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-align center text-blue-500 underline"
-    >
-      View Post
-    </a>
-
-    {/* Delete option for the sender */}
-    {message.sender === userInfo.id && (
-      <span
-        className="delete-icon"
-        data-tooltip-id="deleteTooltip"
-        style={{ color: isHovered ? "red" : "white" }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onClick={() => handleDeleteMessage(message._id)}
-      >
-        <MdDelete />
-      </span>
-    )}
-    <Tooltip id="deleteTooltip" place="top" content="Delete" />
-  </div>
-)}
-
+        {message.messageType === "post" && (
+          <div
+            className={`${
+              message.sender !== selectedChatData._id
+                ? "bg-senderBubble text-senderText border-senderBorder"
+                : "bg-receiverBubble text-receiverText border-receiverBorder"
+            } message-bubble`}
+          >
+            {/* Display Image */}
+            {message.post.imageUrl && checkImage(message.post.imageUrl) ? (
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  setShowImage(true);
+                  setImageUrl(message.post.imageUrl);
+                }}
+              >
+                <img 
+                  src={`${HOST}/${message.post.imageUrl}`} 
+                  height={300} 
+                  width={300} 
+                  alt="Post Image"
+                  onError={(e) =>  { 
+                    e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Image Not Found</p>"; 
+                  }}
+                />
+              </div>
+            ) : null}
+  
+            {/* Display Video */}
+            {message.post.videoUrl ? (
+              <video
+                controls
+                width="300"
+                height="300"
+                src={`${HOST}/${message.post.videoUrl}`}
+                alt="Post Video"
+                onError={(e) =>  { 
+                  e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Video Not Found</p>"; 
+                }}
+              />
+            ) : null}
+  
+            {/* If no image/video, display a description with a link */}
+            {!message.post.imageUrl && !message.post.videoUrl && (
+              <p>{message.post.description}</p>
+            )}
+  
+            {/* Link to the original post */}
+            <a
+              href={message.post.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-align center text-blue-500 underline"
+            >
+              View Post
+            </a>
+  
+            {/* Delete option for the sender */}
+            {message.sender === userInfo.id && (
+              <span
+                className="delete-icon"
+                data-tooltip-id="deleteTooltip"
+                style={{ color: isHovered ? "red" : "white" }}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                onClick={() => handleDeleteMessage(message._id)}
+              >
+                <MdDelete />
+              </span>
+            )}
+            <Tooltip id="deleteTooltip" place="top" content="Delete" />
+          </div>
+        )}
+  
         <div className="text-xs text-gray-600">
           {moment(message.timestamp).format("LT")}
         </div>
       </div>
     );
   };
+  
 
   const renderChannelMessages = (message) => {
     const isCurrentUser = message.sender?._id === userInfo.id;
@@ -399,25 +428,30 @@ const MessageContainer = () => {
             } message-bubble`}
           >
            {checkImage(message.fileUrl) ? (
-  <div className="cursor-pointer" onClick={() => { setShowImage(true); setImageUrl(message.fileUrl); }}>
-    <img
-      src={`${HOST}/${message.fileUrl}`}
-      height={300}
-      width={300}
-      onError={(e) => { e.target.onerror = null; e.target.src = 'fallback-image-url'; }} 
-    />
-  </div>
+          <div className="cursor-pointer" onClick={() => { setShowImage(true); setImageUrl(message.fileUrl); }}>
+            <img
+              src={`${HOST}/${message.fileUrl}`}
+              height={300}
+              width={300}
+              onError={(e) => { 
+                e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Image Not Found</p>"; 
+              }} 
+            />
+          </div>
 ) : checkVideo(message.fileUrl) ? (
   <div className="cursor-pointer" onClick={() => { setShowVideo(true); setVideoUrl(message.fileUrl); }}>
     <video
-      src={`${HOST}/${message.fileUrl}`}
-      height={300}
-      width={300}
-      controls
-      onError={(e) => { e.target.onerror = null; e.target.src = 'fallback-video-url'; }} 
-    >
-      Your browser does not support the video tag.
-    </video>
+  src={`${HOST}/${message.fileUrl}`}
+  height={300}
+  width={300}
+  controls
+  onError={(e) => { 
+    e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Video Not Found</p>"; 
+  }} 
+>
+  Your browser does not support the video tag.
+</video>
+
   </div>
 ) : (
   <div className="flex items-center justify-center gap-4">
@@ -428,7 +462,6 @@ const MessageContainer = () => {
     </span>
   </div>
 )}
-
             {isCurrentUser && (
               <span
               className="delete-icon" data-tooltip-id="deleteTooltip" style={{ color: isHovered ? 'red' : 'white' }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => handleDeleteMessage(message._id)}
