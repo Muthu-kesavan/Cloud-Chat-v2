@@ -214,14 +214,16 @@ const Auth = () => {
                   </>
                 ) : (
                   <>
+                  <InputOTP maxLength={6} value={otp} onChange={handleOtpChange} className="rounded-full p-6">
                     <InputOTPGroup >
-                      <InputOTPSlot onChange={handleOtpChange} value={otp[0]} />
-                      <InputOTPSlot onChange={handleOtpChange} value={otp[1]} />
-                      <InputOTPSlot onChange={handleOtpChange} value={otp[2]} />
-                      <InputOTPSlot onChange={handleOtpChange} value={otp[3]} />
-                      <InputOTPSlot onChange={handleOtpChange} value={otp[4]} />
-                      <InputOTPSlot onChange={handleOtpChange} value={otp[5]} />
+                      <InputOTPSlot index={0}  />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2}  />
+                      <InputOTPSlot index={3}  />
+                      <InputOTPSlot index={4}  />
+                      <InputOTPSlot index={5}  />
                     </InputOTPGroup>
+                    </InputOTP>
                     <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleVerifyOTP}>
                       Verify OTP
                     </Button>

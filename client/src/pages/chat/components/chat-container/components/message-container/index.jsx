@@ -14,7 +14,6 @@ import { GrLocation } from "react-icons/gr";
 import Linkify from "react-linkify";
 import { Tooltip } from 'react-tooltip'
 import { useSocket } from "@/context/socketContext";
-import PostModal from "@/components/ui/PostModal";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -117,11 +116,11 @@ const MessageContainer = () => {
     });
   };
 
-  const downloadFile = async (url) => {
+  const downloadFile = async(url) => {
     setIsDownloading(true);
     setFileDownloadProgress(0);
     const res = await apiClient.get(`${HOST}/${url}`, {
-      responseType: "Blob",
+      responseType: "blob",
       onDownloadProgress: (progressEvent) => {
         const { loaded, total } = progressEvent;
         const percentComplete = Math.round((loaded * 100) / total);

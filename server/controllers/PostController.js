@@ -1,6 +1,5 @@
 import { renameSync, unlinkSync } from 'fs';
 import jwt from "jsonwebtoken";
-import cookieParser from 'cookie-parser'
 import Post from "../models/PostModel.js";
 import User from '../models/UserModel.js';
 import Message from '../models/MessagesModel.js';
@@ -20,16 +19,23 @@ export const createPost = async (req, res) => {
     let isVideo = false;
 
     if (file) {
+      const mimeType = file.mimetype;
+
+      const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const allowedVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo']; 
+
+      if (allowedImageTypes.includes(mimeType)) {
+        isVideo = false;
+      } else if (allowedVideoTypes.includes(mimeType)) {
+        isVideo = true;
+      } else {
+        return res.status(400).json({ error: 'Only image (jpg, jpeg, png) and video (mp4, mov) files are allowed' });
+      }
+
       const date = Date.now();
       const fileName = `uploads/posts/${date}-${file.originalname}`;
-    
       renameSync(file.path, fileName);
       mediaPath = fileName;
-
-      const mimeType = file.mimetype;
-      if (mimeType.startsWith('video/')) {
-        isVideo = true;  
-      }
     }
 
     if (description && mediaPath) {
@@ -46,7 +52,7 @@ export const createPost = async (req, res) => {
         ...(isVideo ? { video: mediaPath } : { picture: mediaPath })
       });
     } else {
-      return res.status(422).json({ error: "Please add either text or a media file (picture or video)" });
+      return res.status(422).json({ error: 'Please add either text or a media file (picture or video)' });
     }
 
     const savedPost = await post.save();
@@ -55,7 +61,7 @@ export const createPost = async (req, res) => {
     res.status(200).json(savedPost);
   } catch (err) {
     console.error(err);
-    return res.status(500).send("Internal Server Error");
+    return res.status(500).send('Internal Server Error');
   }
 };
 

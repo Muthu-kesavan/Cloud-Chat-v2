@@ -1,9 +1,11 @@
 import { compare } from "bcrypt";
+import path from 'path';
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
+
 import {renameSync, unlinkSync} from "fs"
 dotenv.config();
 
@@ -61,16 +63,16 @@ export const signup = async (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        //console.error('Error sending OTP email:', error);
+      console.error('Error sending OTP email:', error);
         return res.status(500).send(`Error sending OTP: ${error.message}`);
       } else {
-        //console.log('Email sent: ' + info.response);
+        console.log('Email sent: ' + info.response);
         return res.status(200).send("OTP sent to your email");
       }
     });
     
   } catch (error) {
-    //console.log({ error });
+    console.log({ error });
     return res.status(500).send("Internal Server Error");
   }
 };
@@ -222,24 +224,38 @@ export const updateProfile = async(req, res)=> {
   }
 }
 
-export const uploadImage = async(req, res)=> {
-  try{
-    if (!req.file){
+export const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
       return res.status(400).send("File is required");
     }
+    const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+    
+    const fileExtension = path.extname(req.file.originalname).toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      return res.status(400).send("Only .jpg, .jpeg, and .png files are allowed");
+    }
+
     const date = Date.now();
     let fileName = "uploads/profiles/" + date + req.file.originalname;
     renameSync(req.file.path, fileName);
 
-    const updatedUser = await User.findByIdAndUpdate(req.userId, {image:fileName}, {new:true, runValidators: true});
+    const updatedUser = await User.findByIdAndUpdate(
+      req.userId,
+      { image: fileName },
+      { new: true, runValidators: true }
+    );
+
     return res.status(200).json({
       image: updatedUser.image,
-  });
-  }catch(err){
-    console.log({err});
+    });
+  } catch (err) {
+    console.log({ err });
     return res.status(500).send("Internal Server Error");
   }
 };
+
 export const removeImage = async(req, res)=>{
   try{
     const {userId} = req;

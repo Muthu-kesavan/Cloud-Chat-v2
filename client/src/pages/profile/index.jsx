@@ -69,19 +69,24 @@ const Profile = () => {
 
   const handleImage = async (e) => {
     const file = e.target.files[0];
-    //console.log({ file });
+  
     if (file) {
+      const allowedExtensions = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedExtensions.includes(file.type)) {
+        toast.error("Only .jpg, .jpeg, and .png files are allowed");
+        return;
+      }
+  
       const formData = new FormData();
       formData.append("profile-image", file);
-
+  
       try {
         const res = await apiClient.post(UPLOAD_IMAGE, formData, { withCredentials: true });
-
+  
         if (res.status === 200 && res.data.image) {
           setUserInfo({ ...userInfo, image: res.data.image });
           setImage(`${HOST}/${res.data.image}`); // Update image state with the new URL
-          //console.log("Updated user info", res.data);
-          toast.success("Image uploaded Successfully");
+          toast.success("Image uploaded successfully");
         }
       } catch (err) {
         console.log("Error uploading image", err);
@@ -89,6 +94,7 @@ const Profile = () => {
       }
     }
   };
+  
 
   const deleteImage = async(req, res)=>{
     try{
