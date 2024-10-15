@@ -11,7 +11,7 @@ const MainPost = () => {
   const { userInfo, createPost } = useAppStore();
   const [postText, setPostText] = useState("");
   const [media, setMedia] = useState(null); 
-  
+  const [mediaInfo, setMediaInfo] = useState("");
 
   const handleMediaChange = (e) => {
     const file = e.target.files[0];

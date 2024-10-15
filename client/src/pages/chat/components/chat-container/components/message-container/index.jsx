@@ -14,6 +14,7 @@ import { GrLocation } from "react-icons/gr";
 import Linkify from "react-linkify";
 import { Tooltip } from 'react-tooltip'
 import { useSocket } from "@/context/socketContext";
+import ChatSkeletonLoader from "@/loaders/ChatSkeletonLoader";
 
 const MessageContainer = () => {
   const scrollRef = useRef();
@@ -32,9 +33,11 @@ const MessageContainer = () => {
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isHovered, setHovered] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getMessages = async () => {
+      setLoading(true);
       try {
         const res = await apiClient.post(GET_MESSAGES, { id: selectedChatData._id }, { withCredentials: true });
         if (res.data.messages) {
@@ -42,10 +45,13 @@ const MessageContainer = () => {
         }
       } catch (err) {
         console.log({ err });
+      } finally{
+        setLoading(false);
       }
     };
 
     const getChannelMessages = async () => {
+      setLoading(true);
       try {
         const res = await apiClient.get(`${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`, { withCredentials: true });
         if (res.data.messages) {
@@ -53,6 +59,8 @@ const MessageContainer = () => {
         }
       } catch (err) {
         console.log({ err });
+      } finally{
+        setLoading(false);
       }
     };
 
@@ -563,8 +571,10 @@ const MessageContainer = () => {
 
   return (
     <div className="flex-1 overflow-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lh:w-[70vw] xl:w-[80vw] w-full">
-      {renderMessages()}
-      <div ref={scrollRef} />
+      <div className="messages" ref={scrollRef} />
+      {loading
+          ? Array.from({ length: 5 }).map((_, index) => <ChatSkeletonLoader key={index} />) // Render skeletons while loading
+          : renderMessages()}
       {showImage && (
         <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
           <div>

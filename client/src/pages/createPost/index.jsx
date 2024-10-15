@@ -9,7 +9,6 @@ const CreatePost = () => {
     const loadUserPosts = async () => {
       await getUserPost();
     };
-
     loadUserPosts();
   }, [getUserPost]);
   return (

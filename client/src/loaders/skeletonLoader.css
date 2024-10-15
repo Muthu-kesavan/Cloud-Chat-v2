@@ -1,0 +1,32 @@
+/* skeletonLoader.css */
+.skeleton-loader {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  margin-right: 10px;
+}
+
+.skeleton-message {
+  flex-grow: 1;
+}
+
+.skeleton-text {
+  height: 15px;
+  background: #e0e0e0;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.skeleton-timestamp {
+  height: 10px;
+  width: 50%;
+  background: #e0e0e0;
+  border-radius: 5px;
+}

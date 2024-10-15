@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAppStore } from "@/store"; 
 import { FaRegComment } from "react-icons/fa";
-import { BsSend } from "react-icons/bs";
 import { MdFavorite, MdFavoriteBorder, MdDelete} from "react-icons/md";
 import { RiSendPlaneLine } from "react-icons/ri";
+import SkeletonLoader from "@/loaders/SkeletonLoader";
+import CommentSkeletonLoader from "@/loaders/CommentSkeletonLoader";
 import formatDistance from "date-fns/formatDistance";
 import { IoBookmark, IoBookmarkOutline } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
@@ -18,6 +19,7 @@ import ProfileModal from "@/components/ui/ProfileModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ShareModal from "@/components/ui/ShareModal";
 import PostModal from "@/components/ui/PostModal";
+
 
 const Post = ({post}) => {
   const {
@@ -40,17 +42,21 @@ const Post = ({post}) => {
   const [isHovered, setHovered] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [loadingUserData, setLoadingUserData] = useState(true);
+  const [loadingComments, setLoadingComments] = useState(true);
   const dateStr = formatDistance(new Date(post.createdAt), new Date());
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoadingUserData(true);
         const res = await apiClient.get(GET_USER.replace(':id', post.userId)); 
         setUserData(res.data || {});
       } catch (err) {
         console.log({ err });
+      } finally{
+        setLoadingUserData(false);
       }
     };
     fetchData();
@@ -71,10 +77,13 @@ const Post = ({post}) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        setLoadingComments(true);
         const fetchedComments = await apiClient.get(GET_POST_COMMENTS(post._id), { withCredentials: true });
         setComments(fetchedComments.data?.comments || []);
       } catch (err) {
         console.error(err);
+      } finally{
+        setLoadingComments(false);
       }
     };
     if (showComments) {
@@ -142,6 +151,10 @@ const Post = ({post}) => {
   const handleShareClick = () => {
     setShareModalOpen(true);
   };
+
+  if (loadingUserData) {
+    return <SkeletonLoader />;
+  }
 
 
   return (
@@ -298,7 +311,11 @@ const Post = ({post}) => {
   
       {showComments && (
         <div className="comments mt-4 border-t border-[#5A00EE] pt-4">
-          <div className="max-h-60 overflow-y-auto">
+          { loadingComments ? 
+          (
+          <CommentSkeletonLoader />
+        ): (
+<div className="max-h-60 overflow-y-auto">
   {comments && comments.length > 0 ? (
     comments.map((comment) => (
       <div key={comment._id} className="border-t py-2 flex items-start">
@@ -335,8 +352,8 @@ const Post = ({post}) => {
     <p className="text-gray-500">No comments yet</p>
   )}
 </div>
-
-
+        )}
+          
           <div className="mt-2 flex">
             <input
               type="text"

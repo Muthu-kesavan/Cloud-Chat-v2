@@ -1,7 +1,7 @@
 import { useAppStore } from '@/store';
 import React from 'react';
 import Post from '@/pages/explore/components/post';
-
+import SkeletonLoader from '@/loaders/SkeletonLoader';
 const UserContent = () => {
   const { userPosts, loading } = useAppStore();
 
@@ -9,7 +9,7 @@ const UserContent = () => {
     <div>
       <div className='col-span-2 border-x-2 border-t-slate-800 px-6'>
         {loading ? ( 
-          <p>loading...</p>
+          <SkeletonLoader />
         ) : userPosts.length > 0 ? (
           userPosts.map((userPost) => (
             <div key={userPost._id} className='p-2'>
@@ -17,7 +17,9 @@ const UserContent = () => {
             </div>
           ))
         ) : (
-          <p>No posts available</p>
+          <div className="flex items-center justify-center text-center text-lg h-full">
+            " Be the first to share your thoughts and start the conversation! "
+          </div>
         )}
       </div>
     </div>

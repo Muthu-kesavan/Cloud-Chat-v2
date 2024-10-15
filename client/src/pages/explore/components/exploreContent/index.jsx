@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppStore } from '@/store'; 
+import SkeletonLoader from '@/loaders/SkeletonLoader';
 import Post from '../post';
 
 const ExploreContent = () => {
@@ -11,7 +12,8 @@ const ExploreContent = () => {
     <div className="grid grid-cols-1 md:grid-cols-2">
       <div className='col-span-2 border-x-2 border-t-slate-800 px-6'>
         {loading ? ( 
-          <p>loading...</p>
+          <SkeletonLoader />
+
         ) : posts.length > 0 ? (
           posts.map((post) => (
             <div key={post._id} className='p-2'>
