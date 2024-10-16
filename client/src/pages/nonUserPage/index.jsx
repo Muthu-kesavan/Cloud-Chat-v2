@@ -236,10 +236,10 @@ const SinglePost = () => {
                             <button onClick={features.canLike ? handleLike: redirectToLogin} className="flex items-center space-x-2 relative">
                                     {post.likes?.includes(userInfo?.id) ? (
                                         <>
-                                        <MdFavorite className="hover:scale-125 transition-transform duration-200 text-[#5A00EE] " />
+                                        <MdFavorite className=" text-[#5A00EE] hover:scale-125 transition-transform duration-200" />
                                         </>
                                     ) : (
-                                        <MdFavoriteBorder className="hover:scale-125 transition-transform duration-200 text-[#5A00EE] " />
+                                        <MdFavoriteBorder className=" text-white hover:scale-125 transition-transform duration-200 " />
                                     )}
                                     <span className='text-white'>{post.likes?.length || 0}</span>
                                     </button>

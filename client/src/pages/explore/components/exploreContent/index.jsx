@@ -29,4 +29,3 @@ const ExploreContent = () => {
 };
 
 export default ExploreContent;
-

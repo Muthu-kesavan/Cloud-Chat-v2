@@ -182,6 +182,8 @@ export const getFeed = async (req, res) => {
   }
 };
 
+
+
 export const sharePost = async (req, res) => {
   try {
     const { postId } = req.params;

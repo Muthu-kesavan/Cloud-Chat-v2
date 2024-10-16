@@ -205,7 +205,7 @@ const Post = ({post}) => {
                 <img
                   src={`${HOST}/${post.picture}`}
                   alt="Enlarged Post"
-                  className="rounded-lg max-h-screen cursor-pointer transition-all duration-300"
+                  className=" rounded-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto object-contain"
                 />
               </div>
             )}

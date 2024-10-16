@@ -34,6 +34,7 @@ export const createSocialSlice = (set, get) => ({
       set({loading: false });
     }
   },
+  
 
   createPost: async (postData) => {
     set({ loading: true });
