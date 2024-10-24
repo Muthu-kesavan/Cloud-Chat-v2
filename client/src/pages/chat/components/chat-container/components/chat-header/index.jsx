@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getColor } from "@/lib/utils";
 import { useAppStore } from "@/store";
-import { HOST } from "@/utils/constants";
 import { RiCloseFill } from "react-icons/ri";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -44,7 +43,7 @@ const ChatHeader = () => {
               <Avatar className="h-12 w-12 rounded-full overflow-hidden">
                 {selectedChatData.image ? (
                   <AvatarImage
-                    src={`${HOST}/${selectedChatData.image}`}
+                    src={`${selectedChatData.image}`}
                     alt="Profile"
                     className="object-cover w-full h-full bg-black"
                   />
@@ -105,7 +104,7 @@ const ChatHeader = () => {
             <div className="flex items-center justify-center">
               {selectedChatData.image ? (
                 <img
-                  src={`${HOST}/${selectedChatData.image}`}
+                  src={`${selectedChatData.image}`}
                   alt="Profile Pic"
                   className="w-64 h-64 rounded-full object-cover"
                 />

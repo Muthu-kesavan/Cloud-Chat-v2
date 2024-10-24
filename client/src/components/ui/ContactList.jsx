@@ -1,6 +1,5 @@
 import { useAppStore } from "@/store";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { HOST } from "@/utils/constants";
 import { getColor } from "@/lib/utils";
 
 const ContactList = ({ contacts = [], isChannel = false }) => {
@@ -39,7 +38,7 @@ const ContactList = ({ contacts = [], isChannel = false }) => {
               <>
                 <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                   {contact.image ? (
-                    <AvatarImage src={`${HOST}/${contact.image}`} alt="Profile" className="object-cover w-full h-full bg-black" />
+                    <AvatarImage src={`${contact.image}`} alt="Profile" className="object-cover w-full h-full bg-black" />
                   ) : (
                     <div className={`${selectedChatData && selectedChatData._id === contact._id ? "bg-[#ffffff22] border border-white/70" : getColor(contact.color)} uppercase h-10 w-10 text-lg border-[1px] flex items-center justify-center rounded-full`}>
                       {contact.name ? contact.name.charAt(0) : contact.email.charAt(0)}

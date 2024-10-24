@@ -1,5 +1,34 @@
 import Message from "../models/MessagesModel.js";
-import {mkdirSync, renameSync} from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+console.log("Cloudinary Config:", {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const getResourceType = (fileExtension) => {
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
+  const videoExtensions = ['.mp4', '.avi', '.mov', '.mkv'];
+  const rawExtensions = ['.pdf', '.docx', '.xlsx'];
+
+  if (imageExtensions.includes(fileExtension)) return 'image';
+  if (videoExtensions.includes(fileExtension)) return 'video';
+  if (rawExtensions.includes(fileExtension)) return 'raw';
+
+  return null; 
+};
 
 export const getMessages = async(req, res)=>{
   try{
@@ -25,47 +54,68 @@ export const getMessages = async(req, res)=>{
 };
 
 
-export const uploadFile = async(req, res)=> {
-  try{
-    if(!req.file){
+export const uploadFile = async (req, res) => {
+  try {
+    if (!req.file) {
       return res.status(400).send("File is not found");
     }
-    const date = Date.now();
-    let fileDir = `uploads/files/${date}`;
-    let fileName = `${fileDir}/${req.file.originalname}`;
 
-    mkdirSync(fileDir,{recursive:true});
+    const fileExtension = path.extname(req.file.originalname).toLowerCase(); 
+    const resourceType = getResourceType(fileExtension); 
 
-    renameSync(req.file.path, fileName);
+    if (!resourceType) {
+      return res.status(400).send("Unsupported file type. Please upload a valid file.");
+    }
 
-    return res.status(200).json({filePath: fileName});
+    const originalFileName = req.file.originalname.replace(/\s+/g, '_'); 
 
-  } catch(err){
-    console.log({err});
+    
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: resourceType,
+        public_id: originalFileName,
+        folder: 'chat/files',
+        type: 'upload', 
+        access_mode: 'public', 
+      },
+      (error, result) => {
+        if (error) {
+          console.error("Upload error:", error);
+          return res.status(500).send("Internal Server Error");
+        }
+
+       
+        return res.status(200).json({ 
+          filePath: result.secure_url 
+        });
+      }
+    );
+
+    
+    fs.createReadStream(req.file.path).pipe(stream);
+
+  } catch (err) {
+    console.error(err);
     return res.status(500).send("Internal Server error");
   }
 };
 
-
-// Delete a message
 export const deleteMessage = async (req, res) => {
   try {
     const {messageId} = req.params;
     const userId = req.userId;  
 
-    // Find the message
     const message = await Message.findById(messageId);
 
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Check if the user is the sender of the message
+
     if (message.sender.toString() !== userId) {
       return res.status(403).json({ message: "You are not authorized to delete this message" });
     }
 
-    // Delete the message
     await Message.findByIdAndDelete(messageId);
 
     return res.status(200).json({ message: "Message deleted successfully" });

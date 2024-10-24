@@ -1,26 +1,29 @@
-import { renameSync, unlinkSync } from 'fs';
+import { unlinkSync } from 'fs';
 import jwt from "jsonwebtoken";
+import cloudinary from 'cloudinary';
 import Post from "../models/PostModel.js";
 import User from '../models/UserModel.js';
 import Message from '../models/MessagesModel.js';
 import Channel from '../models/ChannelModel.js';
 import dotenv from "dotenv";
-
 dotenv.config();
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 export const createPost = async (req, res) => {
   try {
     const { description } = req.body;
-    const file = req.file;
-
-    const userId = req.userId;
+    const file = req.file; 
+    const userId = req.userId; 
     let post;
 
-    let mediaPath = null;
+    let mediaUrl = null;
     let isVideo = false;
 
     if (file) {
       const mimeType = file.mimetype;
-
       const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       const allowedVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo']; 
 
@@ -31,25 +34,26 @@ export const createPost = async (req, res) => {
       } else {
         return res.status(400).json({ error: 'Only image (jpg, jpeg, png) and video (mp4, mov) files are allowed' });
       }
+      const result = await cloudinary.v2.uploader.upload(file.path, {
+        resource_type: isVideo ? 'video' : 'image',
+        folder: 'posts',
+      });
 
-      const date = Date.now();
-      const fileName = `uploads/posts/${date}-${file.originalname}`;
-      renameSync(file.path, fileName);
-      mediaPath = fileName;
+      unlinkSync(file.path);
+      mediaUrl = result.secure_url;
     }
-
-    if (description && mediaPath) {
+    if (description && mediaUrl) {
       post = new Post({
         userId,
         description,
-        ...(isVideo ? { video: mediaPath } : { picture: mediaPath })
+        ...(isVideo ? { video: mediaUrl } : { picture: mediaUrl })
       });
     } else if (description) {
       post = new Post({ userId, description });
-    } else if (mediaPath) {
+    } else if (mediaUrl) {
       post = new Post({
         userId,
-        ...(isVideo ? { video: mediaPath } : { picture: mediaPath })
+        ...(isVideo ? { video: mediaUrl } : { picture: mediaUrl })
       });
     } else {
       return res.status(422).json({ error: 'Please add either text or a media file (picture or video)' });
@@ -57,7 +61,6 @@ export const createPost = async (req, res) => {
 
     const savedPost = await post.save();
     console.log('Saved Post:', savedPost);
-
     res.status(200).json(savedPost);
   } catch (err) {
     console.error(err);
@@ -65,8 +68,8 @@ export const createPost = async (req, res) => {
   }
 };
 
-export const deletePost = async(req, res)=> {
-  try{
+export const deletePost = async (req, res) => {
+  try {
     const { postId } = req.params;
     const userId = req.userId;
 
@@ -80,20 +83,31 @@ export const deletePost = async(req, res)=> {
       return res.status(403).json({ message: "You are not authorized to delete this post" });
     }
 
-    if (post.picture) {
-      unlinkSync(post.picture, (err) => {
-        if (err) {
-          console.error("Error deleting the image file:", err);
-        }
-      });
-    }
+    if (post.picture || post.video) {
+      const mediaUrl = post.picture || post.video;
+      const splitUrl = mediaUrl.split('/');
+      const folder = splitUrl[splitUrl.length - 2]; 
+      const publicIdWithExtension = splitUrl[splitUrl.length - 1]; 
+      const publicId = `${folder}/${publicIdWithExtension.split('.')[0]}`; 
 
+      const resourceType = post.picture ? 'image' : 'video'; 
+
+      const result = await cloudinary.v2.uploader.destroy(publicId, {
+        resource_type: resourceType, 
+      });
+
+      if (result.result === 'ok') {
+        console.log(`Deleted ${resourceType} from Cloudinary: ${publicId}`);
+      } else {
+        console.error(`Failed to delete ${resourceType} from Cloudinary: ${publicId}`, result);
+      }
+    }
     await Post.findByIdAndDelete(postId);
 
     res.status(200).json({ message: "Post deleted successfully" });
 
-  } catch(err){
-    console.error(err)
+  } catch (err) {
+    console.error(err);
     return res.status(500).send("Internal Server Error");
   }
 };

@@ -10,7 +10,6 @@ import { SEARCH_CONTACTS } from "@/utils/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useAppStore } from "@/store";
-import { HOST } from "@/utils/constants";
 
 const NewDm = () => {
   const { setSelectedChatType, setSelectedChatData } = useAppStore();
@@ -90,7 +89,7 @@ const NewDm = () => {
                       <Avatar className="h-12 w-12 rounded-full overflow-hidden">
                         {cont.image ? (
                           <AvatarImage
-                            src={`${HOST}/${cont.image}`}
+                            src={`${cont.image}`}
                             alt="Profile"
                             className="object-cover w-full h-full bg-black rounded-full"
                           />

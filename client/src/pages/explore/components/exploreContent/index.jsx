@@ -13,7 +13,6 @@ const ExploreContent = () => {
       <div className='col-span-2 border-x-2 border-t-slate-800 px-6'>
         {loading ? ( 
           <SkeletonLoader />
-
         ) : posts.length > 0 ? (
           posts.map((post) => (
             <div key={post._id} className='p-2'>

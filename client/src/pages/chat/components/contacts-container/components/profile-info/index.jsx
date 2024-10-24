@@ -53,7 +53,7 @@ const ProfileInfo = () => {
             {
               userInfo && userInfo.image ? (
                 <AvatarImage 
-                  src={`${HOST}/${userInfo.image}`} 
+                  src={`${userInfo.image}`} 
                   alt="Profile" 
                   className="object-cover w-full h-full bg-black" 
                 />

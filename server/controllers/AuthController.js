@@ -1,13 +1,19 @@
 import { compare } from "bcrypt";
 import path from 'path';
+import cloudinary from "cloudinary";
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
-
 import {renameSync, unlinkSync} from "fs"
 dotenv.config();
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const validTime = 2 * 24 * 60 * 60 * 1000;
 
@@ -229,54 +235,73 @@ export const uploadImage = async (req, res) => {
     if (!req.file) {
       return res.status(400).send("File is required");
     }
-    const allowedExtensions = ['.jpg', '.jpeg', '.png'];
-    
+
+    const allowedExtensions = ['.jpg', '.jpeg', '.png',];
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
 
     if (!allowedExtensions.includes(fileExtension)) {
       return res.status(400).send("Only .jpg, .jpeg, and .png files are allowed");
     }
 
-    const date = Date.now();
-    let fileName = "uploads/profiles/" + date + req.file.originalname;
-    renameSync(req.file.path, fileName);
+    // Upload image to Cloudinary
+    const result = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'profiles', // Cloudinary folder to store the profile images
+      public_id: `${req.userId}_${Date.now()}`, // Naming the file uniquely
+      resource_type: 'image',
+      overwrite: true,
+    });
 
+    if (!result) {
+      return res.status(500).send("Failed to upload the image to Cloudinary");
+    }
+
+    // Store the Cloudinary URL in the user profile
     const updatedUser = await User.findByIdAndUpdate(
       req.userId,
-      { image: fileName },
+      { image: result.secure_url }, // Use the secure Cloudinary URL
       { new: true, runValidators: true }
     );
+
+    // Remove the file from the local uploads folder if needed
+    unlinkSync(req.file.path);
 
     return res.status(200).json({
       image: updatedUser.image,
     });
   } catch (err) {
+    console.error({ err });
+    return res.status(500).send("Internal Server Error");
+  }
+};
+
+
+export const removeImage = async (req, res) => {
+  try {
+    const { userId } = req;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    if (user.image) {
+      // Extract public ID from the image URL
+      const publicId = user.image.split('/').pop().split('.')[0]; // Get the public ID from the URL
+
+      // Delete the image from Cloudinary
+      await cloudinary.v2.uploader.destroy(`profiles/${publicId}`, { resource_type: 'image' });
+    }
+
+    // Update the user image field to null
+    user.image = null;
+    await user.save();
+
+    return res.status(200).send("Profile image removed successfully");
+  } catch (err) {
     console.log({ err });
     return res.status(500).send("Internal Server Error");
   }
 };
-
-export const removeImage = async(req, res)=>{
-  try{
-    const {userId} = req;
-    const user = await User.findById(userId);
-    if(!user){
-      return res.status(404).send("User not found")
-    }
-    if (user.image){
-      unlinkSync(user.image)
-    }
-    user.image = null;
-    await user.save();
-
-    return res.status(200).send("Profile image Removed successfully");
-
-  } catch(err){
-    console.log({err});
-    return res.status(500).send("Internal Server Error");
-  }
-};
-
 export const logout = async(req, res)=>{
   try{
     res.cookie("jwt", "",{maxAge:1, secure:true, sameSite: "None"})

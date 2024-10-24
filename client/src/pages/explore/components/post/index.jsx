@@ -164,7 +164,7 @@ const Post = ({post}) => {
           <div className="mb-0 cursor-pointer" onClick={handleProfileClick}>
             {userData.image ? (
               <img
-                src={`${HOST}/${userData.image}`}
+                src={`${userData.image}`}
                 alt="Profile pic"
                 className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
               />
@@ -191,7 +191,7 @@ const Post = ({post}) => {
             controls
             controlsList="nodownload"
             alt="Post Video"
-            src={`${HOST}/${post.video}`}
+            src={`${post.video}`}
             className="rounded-lg max-h-96 max-w-full cursor-pointer transition-all duration-300"
 
           />
@@ -203,14 +203,14 @@ const Post = ({post}) => {
                 onClick={handlePictureClick}
               >
                 <img
-                  src={`${HOST}/${post.picture}`}
+                  src={`${post.picture}`}
                   alt="Enlarged Post"
                   className=" rounded-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto object-contain"
                 />
               </div>
             )}
             <img
-              src={`${HOST}/${post.picture}`}
+              src={`${post.picture}`}
               alt="Post"
               className="rounded-lg max-w-full h-64 object-cover cursor-pointer my-4 transition-transform duration-300 hover:scale-105"
               onClick={handlePictureClick}
@@ -322,7 +322,7 @@ const Post = ({post}) => {
         <div className="mr-2">
           {comment.userId.image ? (
             <img
-              src={`${HOST}/${comment.userId.image}`}
+              src={`${comment.userId.image}`}
               alt="Commenter"
               className="w-8 h-8 rounded-full object-cover"
             />

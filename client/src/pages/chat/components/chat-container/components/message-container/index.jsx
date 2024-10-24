@@ -124,28 +124,32 @@ const MessageContainer = () => {
     });
   };
 
-  const downloadFile = async(url) => {
-    setIsDownloading(true);
-    setFileDownloadProgress(0);
-    const res = await apiClient.get(`${HOST}/${url}`, {
-      responseType: "blob",
-      onDownloadProgress: (progressEvent) => {
-        const { loaded, total } = progressEvent;
-        const percentComplete = Math.round((loaded * 100) / total);
-        setFileDownloadProgress(percentComplete);
-      }
-    });
-    const urlBlob = window.URL.createObjectURL(new Blob([res.data]));
-    const link = document.createElement("a");
-    link.href = urlBlob;
-    link.setAttribute("download", url.split("/").pop());
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(urlBlob);
-    setIsDownloading(false);
-    setFileDownloadProgress(0);
+  const downloadFile = async (cloudinaryUrl) => {
+    try {
+      setIsDownloading(true);
+      setFileDownloadProgress(0);
+      const res = await fetch(cloudinaryUrl);
+      const blob = await res.blob();
+      const urlBlob = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = urlBlob;
+  
+      link.setAttribute('download', cloudinaryUrl.split('/').pop()); 
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(urlBlob);
+      setIsDownloading(false);
+      setFileDownloadProgress(0);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      setIsDownloading(false);
+    }
   };
+  
+  
+
 
   const renderDmMessages = (message) => {
     return (
@@ -195,7 +199,7 @@ const MessageContainer = () => {
                 }}
               >
                 <img 
-                  src={`${HOST}/${message.fileUrl}`} 
+                  src={`${message.fileUrl}`} 
                   height={300} 
                   width={300} 
                   alt="File Image"
@@ -212,7 +216,7 @@ const MessageContainer = () => {
                 }}
               >
                 <video
-                  src={`${HOST}/${message.fileUrl}`}
+                  src={`${message.fileUrl}`}
                   height={300}
                   width={300}
                   controls
@@ -307,7 +311,7 @@ const MessageContainer = () => {
                 }}
               >
                 <img 
-                  src={`${HOST}/${message.post.imageUrl}`} 
+                  src={`${message.post.imageUrl}`} 
                   height={300} 
                   width={300} 
                   alt="Post Image"
@@ -324,7 +328,7 @@ const MessageContainer = () => {
                 controls
                 width="300"
                 height="300"
-                src={`${HOST}/${message.post.videoUrl}`}
+                src={`${message.post.videoUrl}`}
                 alt="Post Video"
                 onError={(e) =>  { 
                   e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Video Not Found</p>"; 
@@ -384,7 +388,7 @@ const MessageContainer = () => {
             <Avatar className="h-8 w-8 rounded-full overflow-hidden">
               {message.sender?.image ? (
                 <AvatarImage
-                  src={`${HOST}/${message.sender.image}`}
+                  src={`${message.sender.image}`}
                   alt="profile"
                   className="object-cover w-full h-full bg-black"
                 />
@@ -437,7 +441,7 @@ const MessageContainer = () => {
            {checkImage(message.fileUrl) ? (
           <div className="cursor-pointer" onClick={() => { setShowImage(true); setImageUrl(message.fileUrl); }}>
             <img
-              src={`${HOST}/${message.fileUrl}`}
+              src={`${message.fileUrl}`}
               height={300}
               width={300}
               onError={(e) => { 
@@ -448,7 +452,7 @@ const MessageContainer = () => {
 ) : checkVideo(message.fileUrl) ? (
   <div className="cursor-pointer" onClick={() => { setShowVideo(true); setVideoUrl(message.fileUrl); }}>
     <video
-  src={`${HOST}/${message.fileUrl}`}
+  src={`${message.fileUrl}`}
   height={300}
   width={300}
   controls
@@ -523,7 +527,7 @@ const MessageContainer = () => {
           setImageUrl(message.post.imageUrl);
         }}
       >
-        <img src={`${HOST}/${message.post.imageUrl}`} height={300} width={300} />
+        <img src={`${message.post.imageUrl}`} height={300} width={300} />
       </div>
     ) : null}
 
@@ -533,7 +537,7 @@ const MessageContainer = () => {
         controls
         width="300"
         height="300"
-        src={`${HOST}/${message.post.videoUrl}`}
+        src={`${message.post.videoUrl}`}
         alt="Post Video"
       />
     ) : null}
@@ -578,7 +582,7 @@ const MessageContainer = () => {
       {showImage && (
         <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
           <div>
-            <img src={`${HOST}/${imageUrl}`} className="h-[80vh] w-full bg-cover" />
+            <img src={`${imageUrl}`} className="h-[80vh] w-full bg-cover" />
           </div>
           <div className="flex gap-5 fixed top-0 mt-5">
             <button

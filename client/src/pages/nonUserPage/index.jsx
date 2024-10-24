@@ -176,7 +176,7 @@ const SinglePost = () => {
                         <div className="cursor-pointer" onClick={features.canLike ? handleProfileClick :redirectToLogin}>
                             {userData.image ? (
                                 <img
-                                    src={`${HOST}/${userData.image}`}
+                                    src={`${userData.image}`}
                                     alt="Profile pic"
                                     className="w-12 h-12 rounded-full object-cover"
                                 />
@@ -202,7 +202,7 @@ const SinglePost = () => {
                         <video
                             controls
                             controlsList="nodownload"
-                            src={`${HOST}/${post.video}`}
+                            src={`${post.video}`}
                             className="rounded-lg max-h-96 max-w-full cursor-pointer transition-all duration-300"
                         />
                     ) : post.picture ? (
@@ -213,14 +213,14 @@ const SinglePost = () => {
                                     onClick={handlePictureClick}
                                 >
                                     <img
-                                        src={`${HOST}/${post.picture}`}
+                                        src={`${post.picture}`}
                                         alt="Enlarged Post"
                                         className="rounded-lg max-h-screen cursor-pointer transition-all duration-300"
                                     />
                                 </div>
                             )}
                             <img
-                                src={`${HOST}/${post.picture}`}
+                                src={`${post.picture}`}
                                 alt="Post"
                                 className="rounded-lg max-w-full h-64 object-cover cursor-pointer my-4 transition-transform duration-300 hover:scale-105"
                                 onClick={handlePictureClick}
@@ -308,7 +308,7 @@ const SinglePost = () => {
         <div className="mr-2">
           {comment.userId.image ? (
             <img
-              src={`${HOST}/${comment.userId.image}`}
+              src={`${comment.userId.image}`}
               alt="Commenter"
               className="w-8 h-8 rounded-full object-cover"
             />

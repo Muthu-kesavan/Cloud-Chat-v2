@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { apiClient } from "@/lib/api-client";
 import { toast } from "sonner";
-import { GET_DM_CONTACTS_ROUTES, GET_USER_CHANNELS, HOST, SEARCH_CONTACTS, SHARE_POST } from '@/utils/constants';
+import { GET_DM_CONTACTS_ROUTES, GET_USER_CHANNELS, SEARCH_CONTACTS, SHARE_POST } from '@/utils/constants';
 import { getColor } from '@/lib/utils';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
 
@@ -146,7 +146,7 @@ const ShareModal = ({ post, isOpen, onClose }) => {
                   <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                     {contact.image ? (
                       <AvatarImage
-                        src={`${HOST}/${contact.image}`}
+                        src={`${contact.image}`}
                         alt="Profile"
                         className="object-cover w-full h-full bg-black"
                       />
@@ -181,7 +181,7 @@ const ShareModal = ({ post, isOpen, onClose }) => {
                   <Avatar className="h-10 w-10 rounded-full overflow-hidden">
                     {result.image ? (
                       <AvatarImage
-                        src={`${HOST}/${result.image}`}
+                        src={`${result.image}`}
                         alt="Profile"
                         className="object-cover w-full h-full bg-black"
                       />

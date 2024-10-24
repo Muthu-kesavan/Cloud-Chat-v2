@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {toast} from "sonner";
 import { apiClient } from "@/lib/api-client";
-import { UPDATE_PROFILE, UPLOAD_IMAGE, HOST, REMOVE_IMAGE } from "@/utils/constants";
+import { UPDATE_PROFILE, UPLOAD_IMAGE, REMOVE_IMAGE } from "@/utils/constants";
 
 
 const Profile = () => {
@@ -27,7 +27,7 @@ const Profile = () => {
       setSelectedColor(userInfo.color);
     }
     if (userInfo.image){
-      setImage(`${HOST}/${userInfo.image}`);
+      setImage(`${userInfo.image}`);
     }
   },[userInfo])
 
@@ -85,7 +85,7 @@ const Profile = () => {
   
         if (res.status === 200 && res.data.image) {
           setUserInfo({ ...userInfo, image: res.data.image });
-          setImage(`${HOST}/${res.data.image}`); // Update image state with the new URL
+          setImage(`${image}`); 
           toast.success("Image uploaded successfully");
         }
       } catch (err) {

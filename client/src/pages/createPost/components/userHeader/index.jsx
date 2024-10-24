@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import { Avatar, AvatarImage } from "@/components/ui/avatar"; // Import Avatar and AvatarImage components
 import { getColor } from '@/lib/utils';
-import { HOST } from '@/utils/constants';
 
 const UserHeader = () => {
   const { userInfo } = useAppStore();
@@ -20,11 +19,11 @@ const UserHeader = () => {
       <div className="flex gap-5 items-center w-full justify-between">
         <div className="flex gap-3 items-center justify-center">
           <div className="w-12 h-12 relative">
-            <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+            <Avatar className="h-12 w-12 rounded-full overflow-hidden">
               {
                 userInfo && userInfo.image ? (
                   <AvatarImage
-                    src={`${HOST}/${userInfo.image}`} 
+                    src={`${userInfo.image}`} 
                     alt="Profile" 
                     className="object-cover w-full h-full bg-black" 
                   />

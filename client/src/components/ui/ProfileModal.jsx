@@ -1,6 +1,5 @@
 import React from 'react';
 import { getColor } from '@/lib/utils';
-import { HOST } from '@/utils/constants';
 
 const ProfileModal = ({ userData, onClose }) => {
   return (
@@ -12,7 +11,7 @@ const ProfileModal = ({ userData, onClose }) => {
         <div className="flex items-center justify-center">
           {userData.image ? (
             <img
-              src={`${HOST}/${userData.image}`} 
+              src={`${userData.image}`} 
               alt="Profile Pic"
               className="w-64 h-64 rounded-full bg-transparent"
             />
