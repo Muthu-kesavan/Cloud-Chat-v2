@@ -1,5 +1,6 @@
 import Message from "../models/MessagesModel.js";
 import { v2 as cloudinary } from 'cloudinary';
+import {v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -10,18 +11,13 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-console.log("Cloudinary Config:", {
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
 });
 
 const getResourceType = (fileExtension) => {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
   const videoExtensions = ['.mp4', '.avi', '.mov', '.mkv'];
-  const rawExtensions = ['.pdf', '.docx', '.xlsx'];
+  const rawExtensions = ['.pdf', '.docx', '.xlsx', '.pptx', '.txt', '.zip'];
 
   if (imageExtensions.includes(fileExtension)) return 'image';
   if (videoExtensions.includes(fileExtension)) return 'video';
@@ -59,7 +55,6 @@ export const uploadFile = async (req, res) => {
     if (!req.file) {
       return res.status(400).send("File is not found");
     }
-
     const fileExtension = path.extname(req.file.originalname).toLowerCase(); 
     const resourceType = getResourceType(fileExtension); 
 
@@ -68,15 +63,14 @@ export const uploadFile = async (req, res) => {
     }
 
     const originalFileName = req.file.originalname.replace(/\s+/g, '_'); 
-
-    
+    const unique_Id = `${uuidv4()}/${originalFileName}`;
     const stream = cloudinary.uploader.upload_stream(
       {
         resource_type: resourceType,
-        public_id: originalFileName,
-        folder: 'chat/files',
+        public_id: unique_Id,
+        folder: 'chat',
         type: 'upload', 
-        access_mode: 'public', 
+
       },
       (error, result) => {
         if (error) {
@@ -86,7 +80,7 @@ export const uploadFile = async (req, res) => {
 
        
         return res.status(200).json({ 
-          filePath: result.secure_url 
+          filePath: result.secure_url,
         });
       }
     );
@@ -99,6 +93,7 @@ export const uploadFile = async (req, res) => {
     return res.status(500).send("Internal Server error");
   }
 };
+
 
 export const deleteMessage = async (req, res) => {
   try {

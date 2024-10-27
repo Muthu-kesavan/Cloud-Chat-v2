@@ -128,6 +128,7 @@ const MessageContainer = () => {
     try {
       setIsDownloading(true);
       setFileDownloadProgress(0);
+      console.log(cloudinaryUrl);
       const res = await fetch(cloudinaryUrl);
       const blob = await res.blob();
       const urlBlob = window.URL.createObjectURL(blob);
