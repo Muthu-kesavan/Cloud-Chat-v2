@@ -327,9 +327,11 @@ const MessageContainer = () => {
             {message.post.videoUrl ? (
               <video
                 controls
+                controlsList="nodownload"
                 width="300"
                 height="300"
                 src={`${message.post.videoUrl}`}
+                
                 alt="Post Video"
                 onError={(e) =>  { 
                   e.target.outerHTML = "<p class='text-red-500 font-semibold p-2 border border-red-300 bg-red-100 rounded'>Video Not Found</p>"; 
@@ -536,6 +538,7 @@ const MessageContainer = () => {
     {message.post.videoUrl ? (
       <video
         controls
+        controlsList="nodownload"
         width="300"
         height="300"
         src={`${message.post.videoUrl}`}
@@ -578,7 +581,7 @@ const MessageContainer = () => {
     <div className="flex-1 overflow-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lh:w-[70vw] xl:w-[80vw] w-full">
       <div className="messages" ref={scrollRef} />
       {loading
-          ? Array.from({ length: 5 }).map((_, index) => <ChatSkeletonLoader key={index} />) // Render skeletons while loading
+          ? Array.from({ length: 5 }).map((_, index) => <ChatSkeletonLoader key={index} />) 
           : renderMessages()}
       {showImage && (
         <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
