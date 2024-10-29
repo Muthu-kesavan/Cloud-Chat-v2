@@ -7,7 +7,7 @@ import { RiSendPlaneLine } from "react-icons/ri";
 import SkeletonLoader from "@/loaders/SkeletonLoader";
 import CommentSkeletonLoader from "@/loaders/CommentSkeletonLoader";
 import formatDistance from "date-fns/formatDistance";
-import { IoBookmark, IoBookmarkOutline } from "react-icons/io5";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
 import { GET_POST_COMMENTS, GET_USER, HOST, REPLY_TO_POST } from "@/utils/constants";
 import { apiClient } from "@/lib/api-client";
@@ -269,10 +269,10 @@ const Post = ({post}) => {
       <button onClick={handleSavePost} className="flex items-center space-x-2">
   {post.saved?.includes(userInfo?.id) ? (
     <>
-      <IoBookmark className="hover:scale-125 transition-transform duration-200" />
+      <FaBookmark className="hover:scale-125 transition-transform duration-200" />
     </>
   ) : (
-    <IoBookmarkOutline className="hover:scale-125 transition-transform duration-200" />
+    <FaRegBookmark className="hover:scale-125 transition-transform duration-200" />
   )}
   {isSaving ? null : null}
 </button>

@@ -26,10 +26,9 @@ const MessageContainer = () => {
     selectedChatMessages, 
     setSelectedChatMessages, 
     userInfo,
-    deleteMessage,
+    deleteMessage
   } = useAppStore();
   const socket = useSocket();
-
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isHovered, setHovered] = useState(false);
@@ -64,6 +63,8 @@ const MessageContainer = () => {
       }
     };
 
+    
+    
     if (selectedChatData._id) {
       if (selectedChatType === 'contact') getMessages();
       else if (selectedChatType === 'channel') getChannelMessages();

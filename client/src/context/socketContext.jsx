@@ -25,25 +25,44 @@ export const SocketProvider = ({ children }) => {
       });
 
       const handleRecieveMessage = (message) => {
-        const { selectedChatType, selectedChatData, addMessage, addContactsInDMContacts } = useAppStore.getState();
+        const { selectedChatType, selectedChatData, addMessage, addContactsInDMContacts, addNotification } = useAppStore.getState();
 
-        if (
-          selectedChatType !== undefined &&
-          (selectedChatData._id === message.sender._id || selectedChatData._id === message.recipient._id)
-        ) {
+        const isChatOpen = selectedChatType !== undefined && 
+                           (selectedChatData._id === message.sender._id || selectedChatData._id === message.recipient._id);
+
+        if (isChatOpen) {
           addMessage(message);
+        } else {
+          // Add a notification if chat is not open
+          addNotification({
+            id: message._id,
+            content: message.content,
+            sender: message.sender,
+            timestamp: new Date(),
+          });
         }
         addContactsInDMContacts(message);
       };
 
+
       const handleRecieveChannelMessage = (message) => {
-        const { selectedChatType, selectedChatData, addMessage, addChannelInChannelList } = useAppStore.getState();
-        if (selectedChatType !== undefined && selectedChatData._id === message.channelId) {
+        const { selectedChatType, selectedChatData, addMessage, addChannelInChannelList, addNotification } = useAppStore.getState();
+        
+        const isChatOpen = selectedChatType !== undefined && selectedChatData._id === message.channelId;
+
+        if (isChatOpen) {
           addMessage(message);
+        } else {
+          // Add a notification for channel message if chat is not open
+          addNotification({
+            id: message._id,
+            content: message.content,
+            channelId: message.channelId,
+            timestamp: new Date(),
+          });
         }
         addChannelInChannelList(message);
       };
-
       const handleDeleteMessage = ({ messageId, channelId }) => {
         const { deleteMessage, deleteChannelMessage } = useAppStore();
         

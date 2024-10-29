@@ -3,6 +3,7 @@ export const createChatSlice = (set, get) => ({
   selectedChatData: undefined, 
   selectedChatMessages: [],
   directMessagesContacts: [],
+  notifications: [],
   isUploading: false,
   isDownloading: false,
   fileUploadProgress: 0,
@@ -109,5 +110,19 @@ export const createChatSlice = (set, get) => ({
   
     set({ selectedChatMessages: updatedMessages, channels: updatedChannels });
   },
+
+  addNotification: (message) => set((state) => ({
+    notifications: [
+      ...state.notifications,
+      {
+        id: message._id,
+        content: message.content,
+        senderName: message.sender.name,  
+        senderId: message.sender._id,
+        timestamp: new Date(),
+      },
+    ],
+    clearNotifications: () => set({ notifications: [] }),
+  })),
   
 });

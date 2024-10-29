@@ -288,12 +288,11 @@ const MessageBar = () => {
           </Tooltip>
         </TooltipProvider>
         
-        <button
-  className="focus:border-none focus:outline-none"
-  onClick={handleSendMsg}
->
-  <IoSend className="text-2xl text-neutral-500 duration-300 transition-all hover:text-white hover:bg-[#5A00EE] p-1 rounded-full" />
-</button>
+        <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
+        onClick={handleSendMsg}
+        >
+          <IoSend className='text-[#5201fe] hover:text-[#7A33FF]  text-2xl' />
+        </button>
 
       </div>
 
