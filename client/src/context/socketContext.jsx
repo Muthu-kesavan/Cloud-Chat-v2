@@ -45,6 +45,7 @@ export const SocketProvider = ({ children }) => {
       };
 
 
+
       const handleRecieveChannelMessage = (message) => {
         const { selectedChatType, selectedChatData, addMessage, addChannelInChannelList, addNotification } = useAppStore.getState();
         
@@ -74,10 +75,21 @@ export const SocketProvider = ({ children }) => {
         }
       };
 
+      const handleUserTyping = ({ senderId }) => {
+        const { setTypingStatus } = useAppStore();
+        setTypingStatus({ userId: senderId, isTyping: true });
+      };
+
+      const handleUserStopTyping = ({ senderId }) => {
+        const { setTypingStatus } = useAppStore();
+        setTypingStatus({ userId: senderId, isTyping: false });
+      };
+
       socket.current.on("recieveMessage", handleRecieveMessage);
       socket.current.on("recieve-channel-message", handleRecieveChannelMessage);
       socket.current.on("messageDeleted", handleDeleteMessage); // Listen for message deletion
-
+      socket.current.on("userTyping", handleUserTyping);
+      socket.current.on("userStopTyping", handleUserStopTyping);
       return () => {
         socket.current.disconnect();
       };

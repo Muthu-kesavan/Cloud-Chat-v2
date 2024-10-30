@@ -239,7 +239,7 @@ const MessageBar = () => {
                 className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
                 onClick={handleLocationClick}
               >
-                <GrLocation className="text-2xl" />
+                <GrLocation className="text-2xl hover:text-white hover:text-3xl transition-all duration-200" />
               </button>
             </TooltipTrigger>
             <TooltipContent className="border-none">
@@ -255,7 +255,7 @@ const MessageBar = () => {
                 className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
                 onClick={handleAttachmentClick}
               >
-                <GrAttachment className="text-2xl" />
+                <GrAttachment className="text-2xl hover:text-white hover:text-3xl transition-all duration-200" />
               </button>
             </TooltipTrigger>
             <TooltipContent className="border-none">
@@ -279,7 +279,7 @@ const MessageBar = () => {
                 onClick={() => setEmojiOpen(true)}
                 ref={emojiRef}
               >
-                <RiEmojiStickerLine className="text-2xl" />
+                <RiEmojiStickerLine className="text-2xl hover:text-white hover:text-3xl transition-all duration-200" />
               </button>
             </TooltipTrigger>
             <TooltipContent className="border-none">
@@ -291,7 +291,7 @@ const MessageBar = () => {
         <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
         onClick={handleSendMsg}
         >
-          <IoSend className='text-[#5201fe] hover:text-[#7A33FF]  text-2xl' />
+          <IoSend size={30} className='text-[#5201fe] hover:text-[#7A33FF]  text-2xl' />
         </button>
 
       </div>
@@ -305,7 +305,7 @@ const MessageBar = () => {
 
       <Dialog open={openModal} onOpenChange={setOpenModal} className="bg-[#5A00EE]">
         <DialogContent>
-          <div id="location-map" className="h-96 w-full" />
+          <div id="location-map" className="h-96 w-full rounded-md " />
           <div className="flex justify-between mt-4">
             <button
               onClick={() => setOpenModal(false)}
@@ -315,7 +315,7 @@ const MessageBar = () => {
             </button>
             <button
               onClick={handleShareLocation}
-              className="bg-[#5A00EE] text-white px-4 py-2 rounded"
+              className="bg-[#5A00EE] hover:bg-[#7A33FF] text-white px-4 py-2 rounded"
             >
               Share Location
             </button>

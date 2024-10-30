@@ -46,6 +46,16 @@ const ContactsContainer = () => {
     navigate('/lets-post');
   };
 
+  const uniqueNotifications = notifications.reduce((acc, notification)=> {
+    const existingNotification = acc.find(n => n.senderId === notification.senderId);
+    if (existingNotification) {
+      existingNotification.count += 1;
+    } else{
+      acc.push({...notification, count: 1});
+    }
+    return acc;
+  }, []);
+
   const handleNotificationsClick = () => {
     setShowNotifications(!showNotifications);
   };
@@ -60,12 +70,12 @@ const ContactsContainer = () => {
       <div className="flex items-center justify-between pt-3 p-4">
         <img src={logo1} alt="logo" width={"120px"} className="ml-4 sm:ml-8" />
         <div onClick={handleNotificationsClick}>
-          {notifications.length > 0 ? (
-            <Badge badgeContent={notifications.length} color="secondary" max={4}>
+          {uniqueNotifications.length > 0 ? (
+            <Badge badgeContent={uniqueNotifications.length} color="secondary" max={4}>
               <MdOutlineNotificationsActive className="text-purple-400 font-light text-3xl cursor-pointer transition-transform duration-300 hover:text-neutral-100" />
             </Badge>
           ) : (
-            <MdOutlineNotifications className="text-neutral-400 font-light text-3xl cursor-pointer transition-transform duration-300 hover:text-neutral-100" />
+            <MdOutlineNotifications className="text-neutral-400 font-light text-3xl cursor-pointer transition-transform duration-300 hover:text-neutral-100 " />
           )}
         </div>
       </div>
@@ -130,16 +140,16 @@ const ContactsContainer = () => {
 
       {showNotifications && (
         <div className="absolute top-12 right-5 bg-[#2f303b] p-4 rounded-lg shadow-md w-72">
-          {notifications.length > 0 ? (
-            notifications.map((notification, index) => (
+          {uniqueNotifications.length > 0 ? (
+            uniqueNotifications.map((notification, index) => (
               <p key={index} className="text-white text-sm mb-2">
-                {notification.senderName} sent you a message
+                {notification.senderName} sent you {notification.count > 1 ? `${notification.count} messages`: 'a message'}
               </p>
             ))
           ) : (
             <p className="text-white text-sm">No notifications</p>
           )}
-          {notifications.length > 0 && (
+          {uniqueNotifications.length > 0 && (
             <button
               onClick={clearAllNotifications}
               className="mt-4 bg-red-600 text-white py-1 px-4 rounded"

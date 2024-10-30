@@ -140,9 +140,23 @@ const setupSocket = (server) => {
     }
 
     socket.on("sendMessage", (message, callback) => sendMessage(message, callback));
-    socket.on("deleteMessage", (messageId, callback) => deleteMessage(messageId, callback)); // Add deletion event
+    socket.on("deleteMessage", (messageId, callback) => deleteMessage(messageId, callback)); 
     socket.on("send-channel-message", (message, callback) => sendChannelMessage(message, callback));
 
+    socket.on("typing", ({ recipientId }) => {
+      const recipientSocketId = userSocketMap.get(recipientId);
+      if (recipientSocketId) {
+        io.to(recipientSocketId).emit("userTyping", { senderId: userId });
+      }
+    });
+
+    socket.on("stopTyping", ({ recipientId }) => {
+      const recipientSocketId = userSocketMap.get(recipientId);
+      if (recipientSocketId) {
+        io.to(recipientSocketId).emit("userStopTyping", { senderId: userId });
+      }
+    });
+    
     socket.on("disconnect", () => disconnect(socket));
   });
 };
