@@ -24,7 +24,7 @@ const NotFound = () => {
         <Button variant="contained"> Back to Login</Button>
         </Link>
         <img 
-        src='src/assets/404.png'
+        src='/404.png'
         alt=""
         width={500} height={250}
         />

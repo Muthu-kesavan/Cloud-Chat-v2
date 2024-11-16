@@ -8,7 +8,6 @@ import {apiClient} from "@/lib/api-client";
 import { LOGIN_ROUTE, SIGNUP_ROUTE, VERIFY_OTP } from "@/utils/constants"
 import { useNavigate } from "react-router-dom"
 import { useAppStore } from "@/store"
-import bgimage3 from "../../assets/bgimage3.webp";
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,7 +110,7 @@ const Auth = () => {
         <div className="flex flex-col gap-10 items-center justify-center">
           <div className="flex items-center justify-center flex-col">
             <div className="flex items-center justify-center">
-              <img src="src/assets/waving-hand.png" alt="emoji" className="h-[80px]" />
+              <img src="/waving-hand.png" alt="emoji" className="h-[80px]" />
               <h1 className="text-5xl font-bold md:text-6xl"> Welcome</h1>
             </div>
             <p className="font-medium text-center">
@@ -213,7 +212,7 @@ const Auth = () => {
             </Tabs>
           </div>
         </div>
-        <div className="bg-[#5A00EE] h-full w-full bg-cover bg-center rounded-r-3xl relative" style={{ backgroundImage: `url(${bgimage3})` }}>
+        <div className="bg-[#5A00EE] h-full w-full bg-cover bg-center rounded-r-3xl relative" style={{ backgroundImage: "url(bgimage3.webp)" }}>
           <div className="absolute w-full h-full bg-black opacity-30"></div>
         </div>
       </div>

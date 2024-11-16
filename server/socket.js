@@ -8,7 +8,7 @@ const setupSocket = (server) => {
   const io = new SocketIOServer(server, {
     pingTimeout: 60000,
     cors: {
-      origin: ['http://localhost:5173','https://cloudchatinc.netlify.app'],
+      origin: ['http://localhost:5173', 'https://cloudchatinc.netlify.app'],
       methods: ["GET", "POST", "DELETE"],
       credentials: true,
     },

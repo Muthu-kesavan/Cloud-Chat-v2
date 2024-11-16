@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import logo1 from "../../../../../src/assets/logo1.png";
 import NewDm from "./components/new-dm";
 import Badge from '@mui/material/Badge';
 import ProfileInfo from "./components/profile-info";
@@ -69,7 +68,7 @@ const ContactsContainer = () => {
   return (
     <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
       <div className="flex items-center justify-between pt-3 p-4">
-        <img src={logo1} alt="logo" width={"120px"} className="ml-4 sm:ml-8" />
+        <img src='/logo1.png' alt="logo" width={"120px"} className="ml-4 sm:ml-8" />
         <div onClick={handleNotificationsClick}>
           {uniqueNotifications.length > 0 ? (
             <Badge badgeContent={uniqueNotifications.length} color="secondary" max={4}>
