@@ -7,7 +7,7 @@
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)](https://www.mongodb.com/)
 
 
-> **Cloud-Chat** is a feature-rich social media platform that allows users to communicate in **one-on-one** and **group chats**, **share images, videos, files, location and text messages**, and securely sign up with **OTP verification**. Users can also engage with **posts** through likes, comments, and replies for better connectivity.
+> **Cloud-Chat** is a feature-rich social media platform that allows users to communicate in **one-on-one** and **group chats**, **share images, videos, posts, files, location** and **text messages**, and securely sign up with **OTP verification**. Users can also engage with **posts** through likes, comments, and replies for better connectivity.
 
 
 ## ✨ Features
@@ -18,11 +18,11 @@
 - 🖼️ **File & Media Sharing**: Share images, documents, and files seamlessly within chats.
 - 📍 **Location Sharing**: Share your location within one-on-one and group chats for better context and connectivity.
 
-- 📅 **Real-Time Messaging**: Instant, real-time communication using WebSockets.
+- 📅 **Real-Time Messaging, Notifications and User Status**: Instant, real-time communication using Socket.io.
 - 💬 **Responsive UI**: Designed for an optimal device experience.
 - 📸 **Social Media Features**: 
   - Share images, videos, and texts as post.
-  - Like, comment, and reply to posts for enhanced interaction.
+  - Like, comment, delete, and reply to posts for enhanced interaction.
   - Save and share posts with existing users and others.
 
 
@@ -37,25 +37,41 @@
 | **Socket.IO**  | Real-time bi-directional event-based communication. |
 | **JWT**        | Secure authentication using JSON Web Tokens.    |
 | **Nodemailer**    | Email service for OTP delivery.                 |
-| **Multer**    |    Handling file uploads and storage.             |
+| **Cloudinary**    |    Handling file uploads and storage.             |
 
 ## 🎨 Screenshots
 
 **Signup Page**
-![Signup Page](https://github.com/user-attachments/assets/8c276987-77ef-47e9-be0d-9decd1c5d60b)
+![Signup](https://github.com/user-attachments/assets/045aafea-92b2-4f48-9317-701e58f9577d)
 
 **Login Page**
-![Login Page](https://github.com/user-attachments/assets/e1c4e805-258f-4086-9191-cf85a14d6d83)
+![Screenshot 2024-11-03 113745](https://github.com/user-attachments/assets/a4c70243-a803-43fe-93df-81a044f2155a)
 
 **HomePage**
-![Home Page](https://github.com/user-attachments/assets/1891ebe3-0d63-459c-8f8f-2aa717f281b9)
+![Home](https://github.com/user-attachments/assets/b00d5f10-e5e1-42e0-8455-b6f636fdc549)
+
+**ChatPage**
+![Chat](https://github.com/user-attachments/assets/f5de10be-1952-4305-a982-24b40c19f552)
+
+**ExplorePage**
+![Explore](https://github.com/user-attachments/assets/97b099c9-38e2-4a32-bdca-9a72ae0ee652)
+d0)
+
+**UserPosts**
+![User](https://github.com/user-attachments/assets/192f29a7-8fd4-416d-91b0-92ac1477ab4b)
+
+**PostShare**
+![PostShare](https://github.com/user-attachments/assets/44f78e16-ddde-4ee0-ba84-dabebe6c0852)
+
+**NonUser**
+![Nonuser](https://github.com/user-attachments/assets/fb5d7f23-f543-46e8-9740-e1061f3a4c1e)
 
 **Profile Page**
 ![Profile Page](https://github.com/user-attachments/assets/981da823-70da-45d3-b874-d9bd041249e9)
 
 ## 📽 Demo Video
 
-[![Watch the demo video](https://github.com/user-attachments/assets/1891ebe3-0d63-459c-8f8f-2aa717f281b9)](https://github.com/user-attachments/assets/b145e58a-d621-4ec1-be1d-f00c30bd8c9a)
+[![Watch the demo video](https://github.com/user-attachments/assets/1c082ec1-60ac-464d-a847-683eb4238955)](https://github.com/user-attachments/assets/1c082ec1-60ac-464d-a847-683eb4238955)
 
 ## 🔧 Installation
 
@@ -161,6 +177,8 @@ CloudChat/
 ### Message Routes
 - `GET /api/messages/get-messages`: Fetch chat messages.
 - `POST /api/messages/upload`: Upload and share files in chats.
+- `POST /api/messages/location`: Share Location in chat.
+- `DELETE /api/messages/messageId/delete`: Delete message in chat.
 
 ### Channel Routes
 - `POST /api/channel/create-channel`: Create a new channel.
@@ -178,7 +196,7 @@ CloudChat/
 -  `PATCH /api/post/postId/save`: Save the Post.
 -  `POST /api/post/postId/share`: Share the Post.
 -  `GET /api/post/saved`: Fetch saved Posts.
-- `GET /api/post/myPost`: Fetch User post.
+- `GET /api/post/lets-post`: Fetch User post.
 
 
 
