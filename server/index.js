@@ -16,14 +16,10 @@ const port = process.env.PORT || 3001;
 const dataBase_url = process.env.DATABASE_URL;
 
 app.use(cors({
-  origin:[process.env.ORIGIN],
-  methods:["GET","POST","PUT","PATCH","DELETE"],
-  credentials: true,
-}))
+  origin: 'http://localhost:5173',
+  credentials: true               
+}));
 
-// app.use('/uploads/profiles', express.static("uploads/profiles"));
-// app.use("/uploads/files", express.static("uploads/files"));
-// app.use("/uploads/posts", express.static("uploads/posts"));
 
 app.use(cookieParser());
 app.use(express.json());
@@ -42,10 +38,16 @@ const server = app.listen(port, ()=>{
 
 setupSocket(server);
 
-mongoose.connect(dataBase_url).then(()=>{
-  console.log("Database connected sucessfully!!")
-}).catch((err)=>{
-  console.log(err.message);
-})
+const connectToDB = async () => {
+  try {
+    await mongoose.connect(dataBase_url);
+    console.log("Database connected successfully!!");
+  } catch (err) {
+    console.error("Database connection failed:", err.message);
+    setTimeout(connectToDB, 5000); 
+  }
+};
+
+connectToDB();
 
 

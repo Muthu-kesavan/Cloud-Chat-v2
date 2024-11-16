@@ -32,10 +32,6 @@ const userSchema = new mongoose.Schema({
   otpExpires: {
     type: Date
   },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
   savedPosts: [
     { 
       type: mongoose.Schema.Types.ObjectId, 

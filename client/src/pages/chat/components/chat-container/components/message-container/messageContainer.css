@@ -61,6 +61,13 @@
 }
 
 
+.typing-indicator {
+  color: white; /* Gray color for typing text */
+  font-size: 100px; /* Smaller font size */
+  margin-top: 10px; /* Space between messages and typing indicator */
+}
+
+
 @media (max-width: 768px) {
   .message-bubble {
     max-width: 90%; 
@@ -82,3 +89,4 @@
     right: -10px; 
   }
 }
+

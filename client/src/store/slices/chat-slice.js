@@ -9,7 +9,8 @@ export const createChatSlice = (set, get) => ({
   fileUploadProgress: 0,
   fileDownloadProgress: 0,
   channels: [],
-  
+  typingStatus: {},
+  onlineStatus: {},
   setChannels: (channels) => set({ channels }),
   setIsUploading: (isUploading) => set({ isUploading }),
   setIsDownloading: (isDownloading) => set({ isDownloading }),
@@ -19,7 +20,25 @@ export const createChatSlice = (set, get) => ({
   setSelectedChatData: (selectedChatData) => set({ selectedChatData }), 
   setSelectedChatMessages: (selectedChatMessages) => set({ selectedChatMessages }), 
   setDirectMessagesContacts: (directMessagesContacts) => set({ directMessagesContacts }),
+  setTypingStatus: (userId, isTyping) => set((state) => {
+    const updatedTypingStatus = { ...state.typingStatus };
+    if (isTyping) {
+      updatedTypingStatus[userId] = true;
+    } else {
+      delete updatedTypingStatus[userId];
+    }
+    return { typingStatus: updatedTypingStatus };
+  }),
 
+  setUserOnlineStatus: ({ userId, isOnline }) => set((state) => {
+    const normalizedUserId = typeof userId === "string" ? userId : String(userId); // Convert to string if needed
+    console.log("Setting online status for userId:", normalizedUserId, "isOnline:", isOnline);
+    
+    const updatedOnlineStatus = { ...state.onlineStatus, [normalizedUserId]: isOnline };
+    return { onlineStatus: updatedOnlineStatus };
+  }),
+  
+  
   addChannel: (channel) => {
     const channels = get().channels;
     set({ channels: [channel, ...channels] });
@@ -115,7 +134,7 @@ export const createChatSlice = (set, get) => ({
     notifications: [
       ...state.notifications,
       {
-        id: message._id,
+        id: message.Id,
         content: message.content,
         senderName: message.sender.name,  
         senderId: message.sender._id,
@@ -124,5 +143,5 @@ export const createChatSlice = (set, get) => ({
     ],
     clearNotifications: () => set({ notifications: [] }),
   })),
-  
+
 });

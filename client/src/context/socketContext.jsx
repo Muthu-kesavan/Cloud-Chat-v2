@@ -11,7 +11,7 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
   const socket = useRef();
-  const { userInfo } = useAppStore();
+  const { userInfo, setUserOnlineStatus } = useAppStore();
 
   useEffect(() => {
     if (userInfo) {
@@ -22,8 +22,16 @@ export const SocketProvider = ({ children }) => {
 
       socket.current.on("connect", () => {
         console.log("Connected to Socket Server");
+        socket.current.emit("user-online",{userId: userInfo.id});
       });
 
+      socket.current.on("update-online-status", (data) => {
+        const userId = data.userId.userId || data.userId; 
+        const isOnline = data.isOnline;
+        console.log("Received update for userId:", userId, "isOnline:", isOnline);
+        setUserOnlineStatus({ userId, isOnline });
+      });
+      
       const handleRecieveMessage = (message) => {
         const { selectedChatType, selectedChatData, addMessage, addContactsInDMContacts, addNotification } = useAppStore.getState();
 
@@ -33,9 +41,8 @@ export const SocketProvider = ({ children }) => {
         if (isChatOpen) {
           addMessage(message);
         } else {
-          // Add a notification if chat is not open
           addNotification({
-            id: message._id,
+            id: message.id,
             content: message.content,
             sender: message.sender,
             timestamp: new Date(),
@@ -54,7 +61,6 @@ export const SocketProvider = ({ children }) => {
         if (isChatOpen) {
           addMessage(message);
         } else {
-          // Add a notification for channel message if chat is not open
           addNotification({
             id: message._id,
             content: message.content,
@@ -66,35 +72,36 @@ export const SocketProvider = ({ children }) => {
       };
       const handleDeleteMessage = ({ messageId, channelId }) => {
         const { deleteMessage, deleteChannelMessage } = useAppStore();
-        
-        // Check if the message belongs to a channel
         if (channelId) {
-          deleteChannelMessage(messageId, channelId); // Remove message from the channel and store
+          deleteChannelMessage(messageId, channelId); 
         } else {
-          deleteMessage(messageId); // Remove message from the store
+          deleteMessage(messageId); 
         }
       };
-
-      const handleUserTyping = ({ senderId }) => {
-        const { setTypingStatus } = useAppStore();
-        setTypingStatus({ userId: senderId, isTyping: true });
-      };
-
-      const handleUserStopTyping = ({ senderId }) => {
-        const { setTypingStatus } = useAppStore();
-        setTypingStatus({ userId: senderId, isTyping: false });
-      };
+      
 
       socket.current.on("recieveMessage", handleRecieveMessage);
       socket.current.on("recieve-channel-message", handleRecieveChannelMessage);
-      socket.current.on("messageDeleted", handleDeleteMessage); // Listen for message deletion
-      socket.current.on("userTyping", handleUserTyping);
-      socket.current.on("userStopTyping", handleUserStopTyping);
+      socket.current.on("messageDeleted", handleDeleteMessage); 
+
+      window.addEventListener("beforeunload", ()=> {
+        socket.current.emit("user-offline", userInfo.id);
+        socket.current.disconnect();
+      })
       return () => {
+        socket.current.off("recieveMessage", handleRecieveMessage);
+        socket.current.off("messageDeleted", handleDeleteMessage);
+        socket.current.off("recieve-channel-message", handleRecieveChannelMessage);
+        socket.current.off("update-online-status");
+
+        window.removeEventListener("beforeunload", ()=> {
+          socket.current.emit("user-offline", userInfo.id);
+        });
+
         socket.current.disconnect();
       };
     }
-  }, [userInfo]);
+  }, [userInfo, setUserOnlineStatus]);
 
   return (
     <SocketContext.Provider value={socket.current}>

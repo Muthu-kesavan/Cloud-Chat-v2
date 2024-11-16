@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
-import { InputOTP, InputOTPGroup,InputOTPSlot,} from "@/components/ui/input-otp"
 import { useState } from "react"
 import { toast } from "sonner"
 import {apiClient} from "@/lib/api-client";
@@ -51,9 +50,10 @@ const Auth = () => {
     if (validateSignup()) {
       try{
         const res = await apiClient.post(SIGNUP_ROUTE, { email, password }, { withCredentials: true });
-      if (res.status === 200) {
-        setIsOTPSent(true);
-        toast.success("OTP sent to your email");
+      if (res.status === 201) {
+        setUserInfo(res.data.user);
+        toast.success("Signup successful!");
+        navigate('/profile');
       }
 
       } catch(err){
@@ -62,22 +62,8 @@ const Auth = () => {
         }else {
           toast.error("An error occurred during signup")
         }
-      }
-      
-      
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    try {
-      const res = await apiClient.post(VERIFY_OTP, { email, otp, password }, { withCredentials: true });
-      if (res.status === 200) {
-        setUserInfo(res.data.user)
-        navigate('/profile');
-        toast.success("Signup successful!");
       } 
-    } catch (error) {
-      toast.error("Invalid or expired OTP");
+      
     }
   };
 
@@ -119,12 +105,9 @@ const Auth = () => {
     
   };
 
-  const handleOtpChange = (otpValue)=> {
-    setOtp(otpValue)
-  }
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">
-      <div className="h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70wv] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2 ">
+      <div className="h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70wv] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2">
         <div className="flex flex-col gap-10 items-center justify-center">
           <div className="flex items-center justify-center flex-col">
             <div className="flex items-center justify-center">
@@ -132,7 +115,7 @@ const Auth = () => {
               <h1 className="text-5xl font-bold md:text-6xl"> Welcome</h1>
             </div>
             <p className="font-medium text-center">
-              Let's Get Started with <span className=" font-bold text-[#5A00EE]">CLOUD-CHAT</span>
+              Let's Get Started with <span className="font-bold text-[#5A00EE]">CLOUD-CHAT</span>
             </p>
           </div>
           <div className="flex items-center justify-center w-full">
@@ -152,17 +135,19 @@ const Auth = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent className="flex flex-col gap-5 mt-10" value="login">
-                <Input placeholder="Email" 
-                type="email" 
-                className="rounded-full p-6 caret-[#5A00EE]" 
-                style={{ caretColor: '#5A00EE' }} 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} />
+                <Input 
+                  placeholder="Email" 
+                  type="email" 
+                  className="rounded-full p-6 caret-[#5A00EE]" 
+                  style={{ caretColor: '#5A00EE' }} 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                />
                 <div className="relative">
                   <Input
                     placeholder="Password"
                     type={showPassword ? "text" : "password"}
-                    className="rounded-full p-6 caret-[#5A00EE]" 
+                    className="rounded-full p-6 caret-[#5A00EE]"
                     style={{ caretColor: '#5A00EE' }}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -172,63 +157,58 @@ const Auth = () => {
                     onClick={togglePassword}
                   />
                 </div>
-                <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleLogin}>
+                <Button
+                  className="rounded-full p-6"
+                  style={{ backgroundColor: '#5A00EE', color: 'white' }}
+                  onClick={handleLogin}
+                >
                   Login
                 </Button>
               </TabsContent>
               <TabsContent className="flex flex-col gap-5" value="signup">
-                {!isOTPSent ? (
-                  <>
-                    <Input placeholder="Email" type="email" className="rounded-full p-6" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <div className="relative">
-                      <Input
-                        placeholder="Password"
-                        type={showPassword ? "text" : "password"}
-                        className="rounded-full p-6 caret-[#5A00EE]" 
-                        style={{ caretColor: '#5A00EE' }}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <IoMdEye
-                        className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
-                        onClick={togglePassword}
-                      />
-                    </div>
-                    <div className="relative">
-                      <Input 
-                        placeholder="Confirm Password"
-                        type={showConfirmPassword ? "text" : "password"}
-                        className="rounded-full p-6 caret-[#5A00EE]" 
-                        style={{ caretColor: '#5A00EE' }}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                      <IoMdEye 
-                        className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showConfirmPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
-                        onClick={toggleConfirmPassword}
-                      />
-                    </div>
-                    <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleSignup}>
-                      Signup
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                  <InputOTP maxLength={6} value={otp} onChange={handleOtpChange} className="rounded-full p-6">
-                    <InputOTPGroup >
-                      <InputOTPSlot index={0}  />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2}  />
-                      <InputOTPSlot index={3}  />
-                      <InputOTPSlot index={4}  />
-                      <InputOTPSlot index={5}  />
-                    </InputOTPGroup>
-                    </InputOTP>
-                    <Button className="rounded-full p-6" style={{ backgroundColor: '#5A00EE', color: 'white' }} onClick={handleVerifyOTP}>
-                      Verify OTP
-                    </Button>
-                  </>
-                )}
+                <Input 
+                  placeholder="Email" 
+                  type="email" 
+                  className="rounded-full p-6 caret-[#5A00EE]" 
+                  style={{ caretColor: '#5A00EE' }} 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                />
+                <div className="relative">
+                  <Input
+                    placeholder="Password"
+                    type={showPassword ? "text" : "password"}
+                    className="rounded-full p-6 caret-[#5A00EE]"
+                    style={{ caretColor: '#5A00EE' }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <IoMdEye
+                    className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
+                    onClick={togglePassword}
+                  />
+                </div>
+                <div className="relative">
+                  <Input 
+                    placeholder="Confirm Password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="rounded-full p-6 caret-[#5A00EE]"
+                    style={{ caretColor: '#5A00EE' }}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  <IoMdEye
+                    className={`text-2xl absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer ${showConfirmPassword ? "text-[#5A00EE]" : "text-gray-500"}`}
+                    onClick={toggleConfirmPassword}
+                  />
+                </div>
+                <Button
+                  className="rounded-full p-6"
+                  style={{ backgroundColor: '#5A00EE', color: 'white' }}
+                  onClick={handleSignup}
+                >
+                  Signup
+                </Button>
               </TabsContent>
             </Tabs>
           </div>
@@ -239,6 +219,7 @@ const Auth = () => {
       </div>
     </div>
   );
+  
 };
 
 export default Auth;

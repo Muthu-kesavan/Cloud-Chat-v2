@@ -20,7 +20,6 @@ const ContactsContainer = () => {
   const [isChannelExpand, setIsChannelExpand] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
-
   useEffect(() => {
     const getContacts = async () => {
       const res = await apiClient.get(GET_DM_CONTACTS_ROUTES, { withCredentials: true });
@@ -55,6 +54,8 @@ const ContactsContainer = () => {
     }
     return acc;
   }, []);
+
+  console.log(uniqueNotifications);
 
   const handleNotificationsClick = () => {
     setShowNotifications(!showNotifications);
@@ -143,7 +144,7 @@ const ContactsContainer = () => {
           {uniqueNotifications.length > 0 ? (
             uniqueNotifications.map((notification, index) => (
               <p key={index} className="text-white text-sm mb-2">
-                {notification.senderName} sent you {notification.count > 1 ? `${notification.count} messages`: 'a message'}
+                {notification.senderName} sent you {notification.count > 1 ? `${notification.count} messages`: 'a Message'}
               </p>
             ))
           ) : (

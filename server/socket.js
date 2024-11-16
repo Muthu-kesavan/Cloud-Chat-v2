@@ -1,4 +1,4 @@
-import { Server as SocketIOServer } from "socket.io";
+import { Socket, Server as SocketIOServer } from "socket.io";
 import dotenv from "dotenv";
 import Message from "./models/MessagesModel.js";
 import Channel from "./models/ChannelModel.js";
@@ -6,20 +6,24 @@ dotenv.config();
 
 const setupSocket = (server) => {
   const io = new SocketIOServer(server, {
+    pingTimeout: 60000,
     cors: {
-      origin: process.env.ORIGIN,
+      origin: 'http://localhost:5173',
       methods: ["GET", "POST", "DELETE"],
       credentials: true,
     },
   });
 
   const userSocketMap = new Map();
+  const onlineUsers = new Map();
 
   const disconnect = (socket) => {
     console.log(`Client disconnected: ${socket.id}`);
     for (const [userId, socketId] of userSocketMap.entries()) {
       if (socketId === socket.id) {
         userSocketMap.delete(userId);
+        onlineUsers.delete(userId);
+        io.emit("update-online-status", {userId, isOnline: false});
         break;
       }
     }
@@ -134,29 +138,25 @@ const setupSocket = (server) => {
 
     if (userId) {
       userSocketMap.set(userId, socket.id);
+      onlineUsers.set(userId, socket.id);
       console.log(`User connected: ${userId} with socket ${socket.id}`);
+      io.emit("update-online-status", {userId, isOnline: true});
     } else {
       console.log("UserId not provided during connection");
     }
 
+    socket.on("user-online", (userId)=> {
+      onlineUsers.set(userId, socket.id);
+      io.emit("update-online-status", {userId, isOnline: true});
+    });
+
+    socket.on("user-offline", (userId)=> {
+      onlineUsers.delete(userId);
+      io.emit("update-online-status", {userId, isOnline: true});
+    });
     socket.on("sendMessage", (message, callback) => sendMessage(message, callback));
     socket.on("deleteMessage", (messageId, callback) => deleteMessage(messageId, callback)); 
     socket.on("send-channel-message", (message, callback) => sendChannelMessage(message, callback));
-
-    socket.on("typing", ({ recipientId }) => {
-      const recipientSocketId = userSocketMap.get(recipientId);
-      if (recipientSocketId) {
-        io.to(recipientSocketId).emit("userTyping", { senderId: userId });
-      }
-    });
-
-    socket.on("stopTyping", ({ recipientId }) => {
-      const recipientSocketId = userSocketMap.get(recipientId);
-      if (recipientSocketId) {
-        io.to(recipientSocketId).emit("userStopTyping", { senderId: userId });
-      }
-    });
-    
     socket.on("disconnect", () => disconnect(socket));
   });
 };

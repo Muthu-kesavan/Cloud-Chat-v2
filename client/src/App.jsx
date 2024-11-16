@@ -4,12 +4,13 @@ import Chat from './pages/chat'
 import Profile from './pages/profile'
 import Explore from './pages/explore'
 import CreatePost from './pages/createPost'
+import NotFound from './pages/notFound'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppStore } from './store'
 import { apiClient } from './lib/api-client'
 import { GET_USER_INFO } from './utils/constants'
 import SinglePost from './pages/nonUserPage'
-
+import { ClipLoader } from 'react-spinners'
 
 
 const PrivateRoute = ({children})=> {
@@ -52,7 +53,11 @@ const App = () => {
   },[userInfo, setUserInfo]);
 
   if (loading){
-    return <div> Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <ClipLoader color="#5A00EE" size={50} />
+      </div>
+    )
   }
   return (
     <BrowserRouter>
@@ -63,7 +68,7 @@ const App = () => {
       <Route path='/explore' element={<PrivateRoute><Explore /></PrivateRoute>} /> 
       <Route  path='/lets-post' element={<PrivateRoute><CreatePost /></PrivateRoute>}/>
       <Route path='/post/:postId' element={<SinglePost />} />
-      <Route path='*' element={<Navigate to="/auth" />}/>
+      <Route path='*' element={<NotFound />}/>
     </Routes>
     </BrowserRouter>
   )

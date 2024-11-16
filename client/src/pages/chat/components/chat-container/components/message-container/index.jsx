@@ -26,14 +26,15 @@ const MessageContainer = () => {
     selectedChatMessages, 
     setSelectedChatMessages, 
     userInfo,
-    deleteMessage
+    deleteMessage,
+    typingStatus
   } = useAppStore();
   const socket = useSocket();
   const [showImage, setShowImage] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isHovered, setHovered] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  console.log('Typing Status:', typingStatus);
   useEffect(() => {
     const getMessages = async () => {
       setLoading(true);
@@ -584,6 +585,16 @@ const MessageContainer = () => {
       {loading
           ? Array.from({ length: 5 }).map((_, index) => <ChatSkeletonLoader key={index} />) 
           : renderMessages()}
+      <div>
+    {/* Your chat messages here */}
+    {Object.entries(typingStatus).map(([userId, isTyping]) => 
+      isTyping ? (
+        <div key={userId} className="typing-indicator">
+          {userId} is typing...
+        </div>
+      ) : null
+    )}
+  </div>
       {showImage && (
         <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
           <div>

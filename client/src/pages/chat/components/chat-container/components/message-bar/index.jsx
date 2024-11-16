@@ -23,7 +23,8 @@ const MessageBar = () => {
   const [map, setMap] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [marker, setMarker] = useState(null);
-
+  const [isTyping, setIsTyping] = useState(false);
+  let typingTimeout;
   useEffect(() => {
     let mapInstance;
 
@@ -116,6 +117,8 @@ const MessageBar = () => {
         socket.emit("send-channel-message", { ...messageData, channelId: selectedChatData._id });
       }
       setMessage("");
+      socket.emit("stopTyping", selectedChatData._id);
+      setIsTyping(false);
     }
   };
 
@@ -124,6 +127,21 @@ const MessageBar = () => {
       e.preventDefault();
       handleSendMsg();
     }
+  };
+
+  const handleTyping = () =>{
+    if (!typingTimeout){
+      setIsTyping(true);
+      socket.emit("typing", selectedChatData._id);
+      console.log("user Typing");
+    }
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(()=>{
+      socket.emit("stopTyping", selectedChatData._id);
+      setIsTyping(false);
+      typingTimeout = null;
+      console.log("User Stopped Typing");
+    }, 1000);
   };
 
   const handleAttachmentClick = () => {
@@ -228,7 +246,10 @@ const MessageBar = () => {
           className="flex-1 p-3 md:p-5 bg-transparent rounded-full focus:border-none focus:outline-none text-white"
           placeholder="Enter Message"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            handleTyping();
+          }}
           onKeyPress={handleKeyPress} 
         />
 
@@ -302,6 +323,7 @@ const MessageBar = () => {
   </div>
 )}
 
+{/* {isTyping && <div className='text-gray-500'>User is Typing...</div>} */}
 
       <Dialog open={openModal} onOpenChange={setOpenModal} className="bg-[#5A00EE]">
         <DialogContent>
