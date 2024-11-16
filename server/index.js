@@ -16,7 +16,7 @@ const port = process.env.PORT || 3001;
 const dataBase_url = process.env.DATABASE_URL;
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'https://cloudchatinc.netlify.app'],
   credentials: true               
 }));
 
