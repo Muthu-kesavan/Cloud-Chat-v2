@@ -54,9 +54,16 @@ const App = () => {
 
   if (loading){
     return (
-      <div className="flex items-center justify-center h-screen">
-        <ClipLoader color="#5A00EE" size={50} />
-      </div>
+      <div className="flex flex-col h-screen justify-between ">
+        <div className='flex items-center justify-center pt-10'>
+          <p className='text-lg font-semifold text-gray-600'>
+          Please wait calmly. We are using the free version for hosting, so it may take 1–2 minutes to load.
+          </p>
+        </div>
+        <div className='flex items-center justify-center pb-10'>
+              <ClipLoader color='#5A00EE' size={50} />
+        </div>
+      </div> 
     )
   }
   return (
