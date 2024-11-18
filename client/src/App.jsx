@@ -56,7 +56,7 @@ const App = () => {
     return (
       <div className="flex flex-col h-screen justify-between ">
         <div className='flex items-center justify-center pt-10'>
-          <p className='text-lg font-semifold text-gray-600'>
+          <p className='text-lg font-semifold text-purple-700'>
           Please wait calmly. We are using the free version for hosting, so it may take 1–2 minutes to load.
           </p>
         </div>
