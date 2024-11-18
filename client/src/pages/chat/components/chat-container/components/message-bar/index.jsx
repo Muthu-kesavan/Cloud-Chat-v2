@@ -239,95 +239,109 @@ const MessageBar = () => {
   };
 
   return (
-    <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-4 md:px-8 mb-6 gap-4 md:gap-6">
-      <div className="flex-1 flex bg-[#2a2b33] rounded-full items-center gap-3 md:gap-5 pr-3 md:pr-5">
+    <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-4 md:px-8 mb-6 gap-3 md:gap-6 relative">
+      {/* Input and Button Container */}
+      <div className="flex-1 flex bg-[#2a2b33] rounded-full items-center gap-3 md:gap-4 pr-3 md:pr-4">
         <input
           type="text"
-          className="flex-1 p-3 md:p-5 bg-transparent rounded-full focus:border-none focus:outline-none text-white"
+          className="flex-1 p-3 md:p-4 bg-transparent rounded-full focus:border-none focus:outline-none text-white placeholder-gray-500"
           placeholder="Enter Message"
           value={message}
           onChange={(e) => {
             setMessage(e.target.value);
             handleTyping();
           }}
-          onKeyPress={handleKeyPress} 
+          onKeyPress={handleKeyPress}
         />
-
+  
+        {/* Location Button */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <button
-                className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                className="text-neutral-500 focus:outline-none hover:text-white transition-all duration-200"
                 onClick={handleLocationClick}
               >
-                <GrLocation className="text-2xl hover:text-white hover:text-3xl transition-all duration-200" />
+                <GrLocation className="text-2xl md:text-3xl" />
               </button>
             </TooltipTrigger>
-            <TooltipContent className="border-none">
+            <TooltipContent>
               <p>Share Location</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-
+  
+        {/* Attachment Button */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <button
-                className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                className="text-neutral-500 focus:outline-none hover:text-white transition-all duration-200"
                 onClick={handleAttachmentClick}
               >
-                <GrAttachment className="text-2xl hover:text-white hover:text-3xl transition-all duration-200" />
+                <GrAttachment className="text-2xl md:text-3xl" />
               </button>
             </TooltipTrigger>
-            <TooltipContent className="border-none">
+            <TooltipContent>
               <p>Attach File</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-
+  
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleAttachmentChange}
           className="hidden"
         />
-        
+  
+        {/* Emoji Button */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <button
-                className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                className="text-neutral-500 focus:outline-none hover:text-white transition-all duration-200"
                 onClick={() => setEmojiOpen(true)}
                 ref={emojiRef}
               >
-                <RiEmojiStickerLine className="text-2xl hover:text-white hover:text-3xl transition-all duration-200" />
+                <RiEmojiStickerLine className="text-2xl md:text-3xl" />
               </button>
             </TooltipTrigger>
-            <TooltipContent className="border-none">
+            <TooltipContent>
               <p>Emoji</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        
-        <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
-        onClick={handleSendMsg}
+  
+        {/* Send Button */}
+        <button
+          className="text-[#5201fe] hover:text-[#7A33FF] transition-all duration-200"
+          onClick={handleSendMsg}
         >
-          <IoSend size={30} className='text-[#5201fe] hover:text-[#7A33FF]  text-2xl' />
+          <IoSend className="text-2xl md:text-3xl" />
         </button>
-
       </div>
-
+  
+      {/* Emoji Picker */}
       {emojiOpen && (
-  <div className="absolute bottom-16 right-0"  ref={emojiRef}>
-    <EmojiPicker theme='dark' open={emojiOpen} onEmojiClick={handleEmoji} autoFocusSearch={false} />
-  </div>
-)}
-
-{/* {isTyping && <div className='text-gray-500'>User is Typing...</div>} */}
-
-      <Dialog open={openModal} onOpenChange={setOpenModal} className="bg-[#5A00EE]">
+        <div className="absolute bottom-[12vh] right-0" ref={emojiRef}>
+          <EmojiPicker
+            theme="dark"
+            open={emojiOpen}
+            onEmojiClick={handleEmoji}
+            autoFocusSearch={false}
+          />
+        </div>
+      )}
+  
+      {/* Location Modal */}
+      <Dialog
+        open={openModal}
+        onOpenChange={setOpenModal}
+        className="bg-[#5A00EE]"
+      >
         <DialogContent>
-          <div id="location-map" className="h-96 w-full rounded-md " />
+          <div id="location-map" className="h-96 w-full rounded-md"></div>
           <div className="flex justify-between mt-4">
             <button
               onClick={() => setOpenModal(false)}
@@ -346,6 +360,7 @@ const MessageBar = () => {
       </Dialog>
     </div>
   );
+  
 };
 
 export default MessageBar;

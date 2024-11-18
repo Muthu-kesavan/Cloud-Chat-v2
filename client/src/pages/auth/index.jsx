@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import {AiOutlineLoading3Quarters} from "react-icons/ai";
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -11,6 +12,7 @@ import { useAppStore } from "@/store"
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [isOTPSent, setIsOTPSent] = useState(false);
@@ -47,6 +49,7 @@ const Auth = () => {
 
   const handleSignup = async () => {
     if (validateSignup()) {
+      setLoading(true);
       try{
         const res = await apiClient.post(SIGNUP_ROUTE, { email, password }, { withCredentials: true });
       if (res.status === 201) {
@@ -61,7 +64,9 @@ const Auth = () => {
         }else {
           toast.error("An error occurred during signup")
         }
-      } 
+      } finally{
+        setLoading(false);
+      }
       
     }
   };
@@ -80,6 +85,7 @@ const Auth = () => {
 
   const handleLogin = async () => {
     if (validateLogin()) {
+      setLoading(true);
       try {
         const res = await apiClient.post(LOGIN_ROUTE, { email, password }, { withCredentials: true });
         if (res.status === 200) {
@@ -99,6 +105,8 @@ const Auth = () => {
         } else {
           toast.error("An error occurred during login");
         }
+      } finally{
+        setLoading(false);
       }
     }
     
@@ -138,7 +146,6 @@ const Auth = () => {
                   placeholder="Email" 
                   type="email" 
                   className="rounded-full p-6 caret-[#5A00EE]" 
-                  style={{ caretColor: '#5A00EE' }} 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                 />
@@ -147,7 +154,6 @@ const Auth = () => {
                     placeholder="Password"
                     type={showPassword ? "text" : "password"}
                     className="rounded-full p-6 caret-[#5A00EE]"
-                    style={{ caretColor: '#5A00EE' }}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -157,11 +163,16 @@ const Auth = () => {
                   />
                 </div>
                 <Button
-                  className="rounded-full p-6"
+                  className="rounded-full p-6 flex items-center justify-center"
                   style={{ backgroundColor: '#5A00EE', color: 'white' }}
                   onClick={handleLogin}
+                  disabled={loading} // Disable button when loading
                 >
-                  Login
+                  {loading ? (
+                    <AiOutlineLoading3Quarters className="animate-spin text-2xl" />
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </TabsContent>
               <TabsContent className="flex flex-col gap-5" value="signup">
@@ -169,7 +180,6 @@ const Auth = () => {
                   placeholder="Email" 
                   type="email" 
                   className="rounded-full p-6 caret-[#5A00EE]" 
-                  style={{ caretColor: '#5A00EE' }} 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                 />
@@ -178,7 +188,6 @@ const Auth = () => {
                     placeholder="Password"
                     type={showPassword ? "text" : "password"}
                     className="rounded-full p-6 caret-[#5A00EE]"
-                    style={{ caretColor: '#5A00EE' }}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -192,7 +201,6 @@ const Auth = () => {
                     placeholder="Confirm Password"
                     type={showConfirmPassword ? "text" : "password"}
                     className="rounded-full p-6 caret-[#5A00EE]"
-                    style={{ caretColor: '#5A00EE' }}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
@@ -202,11 +210,16 @@ const Auth = () => {
                   />
                 </div>
                 <Button
-                  className="rounded-full p-6"
+                  className="rounded-full p-6 flex items-center justify-center"
                   style={{ backgroundColor: '#5A00EE', color: 'white' }}
                   onClick={handleSignup}
+                  disabled={loading} // Disable button when loading
                 >
-                  Signup
+                  {loading ? (
+                    <AiOutlineLoading3Quarters className="animate-spin text-2xl" />
+                  ) : (
+                    "Signup"
+                  )}
                 </Button>
               </TabsContent>
             </Tabs>
@@ -218,7 +231,6 @@ const Auth = () => {
       </div>
     </div>
   );
-  
 };
 
 export default Auth;

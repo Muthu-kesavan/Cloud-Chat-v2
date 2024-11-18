@@ -11,39 +11,26 @@ import {
 } from "@/components/ui/tooltip";
 
 const ChatHeader = () => {
-  const { closeChat, selectedChatData, selectedChatType, onlineStatus } =useAppStore();
+  const { closeChat, selectedChatData, selectedChatType, onlineStatus } =
+    useAppStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Ensure selectedChatData exists
-  if (!selectedChatData) {
-    return null;
-  }
+  if (!selectedChatData) return null;
 
-  console.log("Online Status:", onlineStatus);
-  console.log("Selected User ID:", selectedChatData._id);
   const isOnline = onlineStatus[selectedChatData._id];
-  console.log("Is Online", isOnline);
-
   const openModal = () => {
-    if (selectedChatType === "contact") {
-      setIsModalOpen(true);
-    }
+    if (selectedChatType === "contact") setIsModalOpen(true);
   };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
+  const closeModal = () => setIsModalOpen(false);
   const handleOutsideClick = (e) => {
-    if (e.target.id === "modal-overlay") {
-      closeModal();
-    }
+    if (e.target.id === "modal-overlay") closeModal();
   };
 
   return (
-    <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-20">
-      <div className="flex gap-5 items-center w-full justify-between">
-        <div className="flex gap-3 items-center justify-center">
+    <div className="h-[10vh] border-b border-[#2f303b] flex items-center px-4 md:px-8 lg:px-20 bg-gray-900">
+      <div className="flex gap-4 items-center w-full justify-between">
+        {/* Profile Section */}
+        <div className="flex gap-3 items-center">
           <div
             className={`w-12 h-12 relative ${
               selectedChatType === "contact" ? "cursor-pointer" : ""
@@ -60,7 +47,7 @@ const ChatHeader = () => {
                   />
                 ) : (
                   <div
-                    className={`uppercase h-12 w-12 text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
+                    className={`uppercase h-12 w-12 text-lg border flex items-center justify-center rounded-full ${getColor(
                       selectedChatData.color
                     )}`}
                   >
@@ -76,47 +63,56 @@ const ChatHeader = () => {
               </div>
             )}
           </div>
+
           <div>
-            {selectedChatType === "channel" && selectedChatData.name}
+            {selectedChatType === "channel" && (
+              <span className="text-lg font-semibold">{selectedChatData.name}</span>
+            )}
 
             {selectedChatType === "contact" && (
-              <div className="flex items-center space-x-1">
-                <span>
+              <div className="flex items-center space-x-2">
+                <span className="text-lg font-medium">
                   {selectedChatData.name
                     ? selectedChatData.name
                     : selectedChatData.email}
                 </span>
-
                 {isOnline && (
                   <span className="w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                 )}
               </div>
             )}
 
-            <div className={`text-sm ${isOnline ? "text-green-500" : ""}`}>
+            <div
+              className={`text-sm ${
+                isOnline ? "text-green-500" : "text-gray-500"
+              }`}
+            >
               {isOnline ? "Online" : ""}
             </div>
           </div>
         </div>
 
+        {/* Close Chat Button */}
         <div className="flex items-center justify-center gap-5">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <button
-                  className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+                  className="text-neutral-500 hover:text-white duration-300 transition-all"
                   onClick={closeChat}
                 >
                   <RiCloseFill className="text-3xl" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="border-none">
+              <TooltipContent>
                 <p>Close Chat</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
       </div>
+
+      {/* Modal */}
       {isModalOpen && (
         <div
           id="modal-overlay"
@@ -124,7 +120,7 @@ const ChatHeader = () => {
           onClick={handleOutsideClick}
         >
           <div
-            className="relative bg-transparent p-0 rounded-lg"
+            className="relative bg-gray-800 p-6 rounded-lg shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-center">
@@ -137,7 +133,7 @@ const ChatHeader = () => {
               ) : (
                 selectedChatType === "contact" && (
                   <div
-                    className={`uppercase h-64 w-64 text-6xl border-[1px] flex items-center justify-center rounded-full ${getColor(
+                    className={`uppercase h-64 w-64 text-6xl border flex items-center justify-center rounded-full ${getColor(
                       selectedChatData.color
                     )}`}
                   >

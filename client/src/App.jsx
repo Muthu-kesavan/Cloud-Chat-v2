@@ -68,7 +68,7 @@ const App = () => {
       <Route path='/explore' element={<PrivateRoute><Explore /></PrivateRoute>} /> 
       <Route  path='/lets-post' element={<PrivateRoute><CreatePost /></PrivateRoute>}/>
       <Route path='/post/:postId' element={<SinglePost />} />
-      <Route path='*' element={<NotFound />}/>
+      <Route path='*' element={<Navigate to="/auth" />}/>
     </Routes>
     </BrowserRouter>
   )

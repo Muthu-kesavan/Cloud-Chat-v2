@@ -34,7 +34,7 @@ const MessageContainer = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [isHovered, setHovered] = useState(false);
   const [loading, setLoading] = useState(true);
-  console.log('Typing Status:', typingStatus);
+ 
   useEffect(() => {
     const getMessages = async () => {
       setLoading(true);
@@ -579,48 +579,62 @@ const MessageContainer = () => {
 
 
 
-  return (
-    <div className="flex-1 overflow-auto scrollbar-hidden p-4 px-8 md:w-[65vw] lh:w-[70vw] xl:w-[80vw] w-full">
-      <div className="messages" ref={scrollRef} />
+return (
+  <div className="flex-1 overflow-auto p-4 md:px-8 w-full max-w-[90vw] md:max-w-[65vw] lg:max-w-[70vw] xl:max-w-[80vw] relative">
+    <div className="messages" ref={scrollRef}>
       {loading
-          ? Array.from({ length: 5 }).map((_, index) => <ChatSkeletonLoader key={index} />) 
-          : renderMessages()}
-      <div>
-    {/* Your chat messages here */}
-    {Object.entries(typingStatus).map(([userId, isTyping]) => 
-      isTyping ? (
-        <div key={userId} className="typing-indicator">
-          {userId} is typing...
+        ? Array.from({ length: 5 }).map((_, index) => (
+            <ChatSkeletonLoader key={index} />
+          ))
+        : renderMessages()}
+    </div>
+
+    {/* Typing Indicator */}
+    <div>
+      {Object.entries(typingStatus).map(
+        ([userId, isTyping]) =>
+          isTyping && (
+            <div
+              key={userId}
+              className="typing-indicator text-sm text-gray-500 italic mt-2"
+            >
+              {userId} is typing...
+            </div>
+          )
+      )}
+    </div>
+
+    {/* Image Preview Modal */}
+    {showImage && (
+      <div className="fixed inset-0 z-[1000] flex items-center justify-center backdrop-blur-md bg-black/50">
+        <div className="relative">
+          <img
+            src={`${imageUrl}`}
+            alt="Preview"
+            className="h-[80vh] max-w-full object-contain"
+          />
         </div>
-      ) : null
+        <div className="flex gap-5 absolute top-5 right-5">
+          <button
+            className="bg-black/50 p-3 text-2xl text-white rounded-full hover:bg-black/80 transition-all duration-300"
+            onClick={() => downloadFile(imageUrl)}
+          >
+            <IoMdArrowDown />
+          </button>
+          <button
+            className="bg-black/50 p-3 text-2xl text-white rounded-full hover:bg-black/80 transition-all duration-300"
+            onClick={() => {
+              setShowImage(false);
+              setImageUrl(null);
+            }}
+          >
+            <IoCloseSharp />
+          </button>
+        </div>
+      </div>
     )}
   </div>
-      {showImage && (
-        <div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
-          <div>
-            <img src={`${imageUrl}`} className="h-[80vh] w-full bg-cover" />
-          </div>
-          <div className="flex gap-5 fixed top-0 mt-5">
-            <button
-              className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
-              onClick={() => downloadFile(imageUrl)}
-            >
-              <IoMdArrowDown />
-            </button>
-            <button
-              className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
-              onClick={() => {
-                setShowImage(false);
-                setImageUrl(null);
-              }}
-            >
-              <IoCloseSharp />
-            </button>
-          </div>
-        </div>
-      )}
+);
 
-    </div>
-  );
 };
 export default MessageContainer;
