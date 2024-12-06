@@ -212,7 +212,7 @@ export const sharePost = async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    const shareableLink = `http://127.0.0.1:5173/post/${postId}`;
+    const shareableLink = `https://cloudchatinc.netlify.app/post/${postId}`;
 
     const sharedMessages = await Promise.all(recipientIds.map(async (recipientId) => {
       const group = await Channel.findById(recipientId);
