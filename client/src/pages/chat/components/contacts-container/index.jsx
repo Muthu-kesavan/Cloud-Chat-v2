@@ -8,10 +8,13 @@ import { useAppStore } from "@/store";
 import ContactList from "@/components/ui/ContactList";
 import CreateChannel from "./components/create-channel";
 import { FaCaretDown, FaRegCompass } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa6"
+import { FaInstagram } from "react-icons/fa";
 import { TbWriting } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineNotifications } from "react-icons/md";
 import { MdOutlineNotificationsActive } from "react-icons/md";
+
 
 const ContactsContainer = () => {
   const { directMessagesContacts, setDirectMessagesContacts, channels, setChannels, notifications, clearNotifications } = useAppStore();
@@ -64,6 +67,15 @@ const ContactsContainer = () => {
     clearNotifications();
     setShowNotifications(false);
   };
+
+  const handleWhatsapp = () => {
+    window.open('https://web.whatsapp.com', '_blank');
+  };
+
+  const handleInstagram = ()=> {
+    window.open('https://instagram.com', '_blank');
+  }
+  
 
   return (
     <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
@@ -134,6 +146,20 @@ const ContactsContainer = () => {
             <ContactList contacts={channels} isChannel={true} />
           </div>
         )}
+      </div>
+
+      <div className="my-5 ">
+        <div className="flex items-center justify-between pr-10 cursor-pointer" onClick={handleWhatsapp}>
+          <Title text="Whatsapp" />
+          <FaWhatsapp className="text-neutral-400 font-light text-3xl cursor-pointer transition-transform duration-300 hover:translate-x-[10px] hover:text-neutral-100 ml-0" />
+        </div>
+      </div>
+
+      <div className="my-5 ">
+        <div className="flex items-center justify-between pr-10 cursor-pointer" onClick={handleInstagram}>
+          <Title text="Instagram" />
+          <FaInstagram className="text-neutral-400 font-light text-3xl cursor-pointer transition-transform duration-300 hover:translate-x-[10px] hover:text-neutral-100 ml-0" />
+        </div>
       </div>
 
       <ProfileInfo />
