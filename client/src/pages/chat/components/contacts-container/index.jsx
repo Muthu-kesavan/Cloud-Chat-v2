@@ -69,8 +69,17 @@ const ContactsContainer = () => {
   };
 
   const handleWhatsapp = () => {
-    window.open('https://web.whatsapp.com', '_blank');
-  };
+    const whatsappAppUrl = 'whatsapp://send';
+    const whatsappWebUrl = 'https://web.whatsapp.com';
+
+    window.location.href = whatsappAppUrl;
+
+    setTimeout(() => {
+        window.open(whatsappWebUrl, '_blank');
+    }, 800); 
+};
+
+
 
   const handleInstagram = ()=> {
     window.open('https://instagram.com', '_blank');

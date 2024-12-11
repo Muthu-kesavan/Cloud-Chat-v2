@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getColor } from "@/lib/utils";
 import { useAppStore } from "@/store";
-import { RiCloseFill } from "react-icons/ri";
+import { IoMdArrowRoundBack } from "react-icons/io";
 import {
   Tooltip,
   TooltipContent,
@@ -28,7 +28,24 @@ const ChatHeader = () => {
 
   return (
     <div className="h-[10vh] border-b border-[#2f303b] flex items-center px-4 md:px-8 lg:px-20 bg-gray-900">
-      <div className="flex gap-4 items-center w-full justify-between">
+      <div className="flex gap-5 items-center w-full">
+        {/* Back Button */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <button
+                className="text-neutral-500 hover:text-white duration-300 transition-all"
+                onClick={closeChat}
+              >
+                <IoMdArrowRoundBack className="text-3xl" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Back</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
         {/* Profile Section */}
         <div className="flex gap-3 items-center">
           <div
@@ -38,7 +55,7 @@ const ChatHeader = () => {
             onClick={openModal}
           >
             {selectedChatType === "contact" ? (
-              <Avatar className="h-12 w-12 rounded-full overflow-hidden relative">
+              <Avatar className="h-10 w-10 rounded-full overflow-hidden relative">
                 {selectedChatData.image ? (
                   <AvatarImage
                     src={selectedChatData.image}
@@ -90,25 +107,6 @@ const ChatHeader = () => {
               {isOnline ? "Online" : ""}
             </div>
           </div>
-        </div>
-
-        {/* Close Chat Button */}
-        <div className="flex items-center justify-center gap-5">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <button
-                  className="text-neutral-500 hover:text-white duration-300 transition-all"
-                  onClick={closeChat}
-                >
-                  <RiCloseFill className="text-3xl" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Close Chat</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </div>
 
