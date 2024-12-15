@@ -5,7 +5,7 @@ dotenv.config();
 
 export const verifyToken = (req, res, next) => {
   const token = req.cookies.jwt;
-  console.log({token});
+  // console.log({token});
   if (!token) {
     return res.status(401).send("You are not authenticated");
   }

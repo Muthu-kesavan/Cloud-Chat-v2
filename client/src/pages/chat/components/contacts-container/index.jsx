@@ -69,15 +69,17 @@ const ContactsContainer = () => {
   };
 
   const handleWhatsapp = () => {
-    const whatsappAppUrl = 'whatsapp://send';
-    const whatsappWebUrl = 'https://web.whatsapp.com';
+    const whatsappAppUrl = 'whatsapp://'; // Opens the WhatsApp app on mobile devices.
 
+    // Attempt to open the WhatsApp app
     window.location.href = whatsappAppUrl;
 
+    // Optional: Fallback to WhatsApp Web if the app doesn't open (not needed for mobile-only focus)
     setTimeout(() => {
-        window.open(whatsappWebUrl, '_blank');
-    }, 800); 
+        alert('Unable to open WhatsApp. Please ensure it is installed on your device.');
+    }, 1000);
 };
+
 
 
 
