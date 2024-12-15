@@ -8,7 +8,7 @@ import { useAppStore } from "@/store";
 import ContactList from "@/components/ui/ContactList";
 import CreateChannel from "./components/create-channel";
 import { FaCaretDown, FaRegCompass } from "react-icons/fa";
-import { FaWhatsapp } from "react-icons/fa6"
+// import { FaWhatsapp } from "react-icons/fa6"
 import { FaInstagram } from "react-icons/fa";
 import { TbWriting } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
@@ -68,17 +68,17 @@ const ContactsContainer = () => {
     setShowNotifications(false);
   };
 
-  const handleWhatsapp = () => {
-    const whatsappAppUrl = 'whatsapp://'; // Opens the WhatsApp app on mobile devices.
+//   const handleWhatsapp = () => {
+//     const whatsappAppUrl = 'whatsapp://'; // Opens the WhatsApp app on mobile devices.
 
-    // Attempt to open the WhatsApp app
-    window.location.href = whatsappAppUrl;
+//     // Attempt to open the WhatsApp app
+//     window.location.href = whatsappAppUrl;
 
-    // Optional: Fallback to WhatsApp Web if the app doesn't open (not needed for mobile-only focus)
-    setTimeout(() => {
-        alert('Unable to open WhatsApp. Please ensure it is installed on your device.');
-    }, 1000);
-};
+//     // Optional: Fallback to WhatsApp Web if the app doesn't open (not needed for mobile-only focus)
+//     setTimeout(() => {
+//         alert('Unable to open WhatsApp. Please ensure it is installed on your device.');
+//     }, 1000);
+// };
 
 
 
@@ -159,12 +159,12 @@ const ContactsContainer = () => {
         )}
       </div>
 
-      <div className="my-5 ">
+      {/* <div className="my-5 ">
         <div className="flex items-center justify-between pr-10 cursor-pointer" onClick={handleWhatsapp}>
           <Title text="Whatsapp" />
           <FaWhatsapp className="text-neutral-400 font-light text-3xl cursor-pointer transition-transform duration-300 hover:translate-x-[10px] hover:text-neutral-100 ml-0" />
         </div>
-      </div>
+      </div> */}
 
       <div className="my-5 ">
         <div className="flex items-center justify-between pr-10 cursor-pointer" onClick={handleInstagram}>
