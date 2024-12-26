@@ -27,17 +27,17 @@ const ChatHeader = () => {
   };
 
   return (
-    <div className="h-[10vh] border-b border-[#2f303b] flex items-center px-4 md:px-8 lg:px-20 bg-gray-900">
-      <div className="flex gap-5 items-center w-full">
+    <div className="h-[10vh] min-h-[60px] max-h-[80px] border-b border-[#2f303b] flex items-center px-3 sm:px-4 md:px-6 lg:px-8 bg-gray-900 transition-all duration-300">
+      <div className="flex gap-3 sm:gap-4 md:gap-5 items-center w-full">
         {/* Back Button */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <button
-                className="text-neutral-500 hover:text-white duration-300 transition-all"
+                className="text-neutral-500 hover:text-white duration-300 transition-all p-2 rounded-full hover:bg-gray-800"
                 onClick={closeChat}
               >
-                <IoMdArrowRoundBack className="text-3xl" />
+                <IoMdArrowRoundBack className="text-2xl sm:text-3xl" />
               </button>
             </TooltipTrigger>
             <TooltipContent>
@@ -47,15 +47,15 @@ const ChatHeader = () => {
         </TooltipProvider>
 
         {/* Profile Section */}
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 sm:gap-3 items-center flex-1">
           <div
-            className={`w-12 h-12 relative ${
+            className={`relative ${
               selectedChatType === "contact" ? "cursor-pointer" : ""
             }`}
             onClick={openModal}
           >
             {selectedChatType === "contact" ? (
-              <Avatar className="h-10 w-10 rounded-full overflow-hidden relative">
+              <Avatar className="h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden">
                 {selectedChatData.image ? (
                   <AvatarImage
                     src={selectedChatData.image}
@@ -64,7 +64,7 @@ const ChatHeader = () => {
                   />
                 ) : (
                   <div
-                    className={`uppercase h-12 w-12 text-lg border flex items-center justify-center rounded-full ${getColor(
+                    className={`uppercase h-full w-full text-sm sm:text-base border flex items-center justify-center rounded-full ${getColor(
                       selectedChatData.color
                     )}`}
                   >
@@ -75,26 +75,26 @@ const ChatHeader = () => {
                 )}
               </Avatar>
             ) : (
-              <div className="bg-[#ffffff22] h-10 w-10 flex items-center justify-center rounded-full">
+              <div className="bg-[#ffffff22] h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center rounded-full">
                 #
               </div>
             )}
           </div>
 
-          <div>
+          <div className="min-w-0 flex-1">
             {selectedChatType === "channel" && (
-              <span className="text-lg font-semibold">{selectedChatData.name}</span>
+              <span className="text-base sm:text-lg font-semibold truncate block">
+                {selectedChatData.name}
+              </span>
             )}
 
             {selectedChatType === "contact" && (
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-medium">
-                  {selectedChatData.name
-                    ? selectedChatData.name
-                    : selectedChatData.email}
+                <span className="text-base sm:text-lg font-medium truncate">
+                  {selectedChatData.name || selectedChatData.email}
                 </span>
                 {isOnline && (
-                  <span className="w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                  <span className="flex-shrink-0 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 border-2 border-white rounded-full"></span>
                 )}
               </div>
             )}
